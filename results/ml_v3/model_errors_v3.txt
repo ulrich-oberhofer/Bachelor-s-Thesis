@@ -1,0 +1,24 @@
+
+AUS: Detrended Drift (Linear Regression)
+Mean Squared Error: 0.00032960512607073156
+Mean Absolute Error: 0.014747657062926125
+Mean Absolute Percentage Error: 0.1599839496744707
+r2-Score: 0.03047117277966538
+
+AUS: Detrended Diffusion (Linear Regression)
+Mean Squared Error: 1.1453197548783731e-08
+Mean Absolute Error: 8.478450842150502e-05
+Mean Absolute Percentage Error: 0.1539723250687735
+r2-Score: 0.25129277862347743
+
+CE: Detrended Drift (Linear Regression)
+Mean Squared Error: 2.707894035829464e-06
+Mean Absolute Error: 0.0013135500645651628
+Mean Absolute Percentage Error: 0.1291402043368061
+r2-Score: 0.3819772382114679
+
+CE: Detrended Diffusion (Linear Regression)
+Mean Squared Error: 1.1243518289162829e-11
+Mean Absolute Error: 2.623521226262328e-06
+Mean Absolute Percentage Error: 0.08913817703590249
+r2-Score: 0.6543982963707277

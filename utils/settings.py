@@ -131,6 +131,7 @@ plotting = {
     'color_gbt_xgb_absoluteerror': colormap(9),  # light purple
     'color_rf_lgb': colormap(18),                # cyan
     'color_mlp': colormap(19),                   # light cyan
+    'color_lin_reg': colormap(16),               # light brown #!!! this is added
 
     # specific plotting settings for script 02
     'plotting type': 'average and frequency',    # possible options 'average', 'sequential', 'average and frequency'

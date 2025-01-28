@@ -1,0 +1,20 @@
+
+AUS: Detrended Drift (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False
+
+AUS: Detrended Diffusion (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False
+
+CE: Detrended Drift (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False
+
+CE: Detrended Diffusion (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False

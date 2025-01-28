@@ -4,7 +4,7 @@
 import lightgbm as lgb
 import numpy as np
 import xgboost as xgb
-import shap
+#import shap
 import joblib as jbl
 import pandas as pd
 
@@ -16,7 +16,8 @@ from scipy.stats import uniform, randint
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.neural_network import MLPRegressor
-
+import sys
+sys.path.append('..')
 from utils import ml_parameters
 from utils import settings as s
 
@@ -274,171 +275,172 @@ for area in ['AUS', 'CE']:
         min_max_scaler.fit(X_train.drop(columns=s.top_features[area][target]['mlp']).values if s.ml[
             'knockout'] else X_train.values)
 
-        # fit models (gbt: gradient boosted tree, rf: random forest, mlp: multi layer perceptron)
-        gbt_lgb_model = fit_gbdt_lgb(
-            X_train.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_train,
-            y_train,
-            ml_parameters.parameters_v3[area][target]['gbt_lgb'],
-            s.ml['random search gbt_lgb']
-        )
-        gbt_xgb_squarederror_model = fit_xgb(
-            X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
-                'knockout'] else X_train,
-            y_train,
-            ml_parameters.parameters_v3[area][target]['gbt_xgb_squarederror'],
-            'reg:squarederror',
-            s.ml['random search gbt_xgb_squarederror']
-        )
-        gbt_xgb_absoluteerror_model = fit_xgb(
-            X_train.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml[
-                'knockout'] else X_train,
-            y_train,
-            ml_parameters.parameters_v3[area][target]['gbt_xgb_absoluteerror'],
-            'reg:absoluteerror',
-            s.ml['random search gbt_xgb_absoluteerror']
-        )
-        rf_lgb_model = fit_rf_lgb(
-            X_train.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_train,
-            y_train,
-            ml_parameters.parameters_v3[area][target]['rf_lgb'],
-            s.ml['random search rf_lgb']
-        )
-        mlp_model = fit_mlp(
-            impute_scale(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train),
-            y_train,
-            ml_parameters.parameters_v3[area][target]['mlp'],
-            s.ml['grid search mlp']
-        )
+        # # fit models (gbt: gradient boosted tree, rf: random forest, mlp: multi layer perceptron)
+        # gbt_lgb_model = fit_gbdt_lgb(
+        #     X_train.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_train,
+        #     y_train,
+        #     ml_parameters.parameters_v3[area][target]['gbt_lgb'],
+        #     s.ml['random search gbt_lgb']
+        # )
+        # gbt_xgb_squarederror_model = fit_xgb(
+        #     X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
+        #         'knockout'] else X_train,
+        #     y_train,
+        #     ml_parameters.parameters_v3[area][target]['gbt_xgb_squarederror'],
+        #     'reg:squarederror',
+        #     s.ml['random search gbt_xgb_squarederror']
+        # )
+        # gbt_xgb_absoluteerror_model = fit_xgb(
+        #     X_train.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml[
+        #         'knockout'] else X_train,
+        #     y_train,
+        #     ml_parameters.parameters_v3[area][target]['gbt_xgb_absoluteerror'],
+        #     'reg:absoluteerror',
+        #     s.ml['random search gbt_xgb_absoluteerror']
+        # )
+        # rf_lgb_model = fit_rf_lgb(
+        #     X_train.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_train,
+        #     y_train,
+        #     ml_parameters.parameters_v3[area][target]['rf_lgb'],
+        #     s.ml['random search rf_lgb']
+        # )
+        # mlp_model = fit_mlp(
+        #     impute_scale(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train),
+        #     y_train,
+        #     ml_parameters.parameters_v3[area][target]['mlp'],
+        #     s.ml['grid search mlp']
+        # )
         lin_reg_model = fit_linear_regression(
-            X_train.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_train,
+            impute_scale(X_train.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_train),
             y_train
         )
 
 
-        # predict models
-        y_pred_gbt_lgb = gbt_lgb_model.predict(
-            X_test.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_test
-        )
-        y_pred_gbt_xgb_squarederror = gbt_xgb_squarederror_model.predict(
-            X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test
-        )
-        y_pred_gbt_xgb_absoluteerror = gbt_xgb_absoluteerror_model.predict(
-            X_test.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_test
-        )
-        y_pred_rf_lgb = rf_lgb_model.predict(
-            X_test.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_test
-        )
-        y_pred_mlp = mlp_model.predict(impute_scale(
-            X_test.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_test
-        ))
-        y_pred_lin_reg = lin_reg_model.predict(
+        # # predict models
+        # y_pred_gbt_lgb = gbt_lgb_model.predict(
+        #     X_test.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_test
+        # )
+        # y_pred_gbt_xgb_squarederror = gbt_xgb_squarederror_model.predict(
+        #     X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test
+        # )
+        # y_pred_gbt_xgb_absoluteerror = gbt_xgb_absoluteerror_model.predict(
+        #     X_test.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_test
+        # )
+        # y_pred_rf_lgb = rf_lgb_model.predict(
+        #     X_test.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_test
+        # )
+        # y_pred_mlp = mlp_model.predict(impute_scale(
+        #     X_test.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_test
+        # ))
+        y_pred_lin_reg = lin_reg_model.predict(impute_scale(
             X_test.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_test
-        )
+        ))
 
         # evaluate models
         model_description = f'{area}: Detrended {target.capitalize()}'
-        evaluate_model(
-            y_test, y_pred_gbt_lgb,
-            f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
-        )
-        evaluate_model(
-            y_test, y_pred_gbt_xgb_squarederror,
-            f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
-        )
-        evaluate_model(
-            y_test, y_pred_gbt_xgb_absoluteerror,
-            f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
-        )
-        evaluate_model(
-            y_test, y_pred_rf_lgb,
-            f'{model_description} (Random Forest, LightGBM)'
-        )
-        evaluate_model(
-            y_test, y_pred_mlp,
-            f'{model_description} (Multi Layer Perceptron)'
-        )
+        # evaluate_model(
+        #     y_test, y_pred_gbt_lgb,
+        #     f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
+        # )
+        # evaluate_model(
+        #     y_test, y_pred_gbt_xgb_squarederror,
+        #     f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
+        # )
+        # evaluate_model(
+        #     y_test, y_pred_gbt_xgb_absoluteerror,
+        #     f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
+        # )
+        # evaluate_model(
+        #     y_test, y_pred_rf_lgb,
+        #     f'{model_description} (Random Forest, LightGBM)'
+        # )
+        # evaluate_model(
+        #     y_test, y_pred_mlp,
+        #     f'{model_description} (Multi Layer Perceptron)'
+        # )
         evaluate_model(
             y_test, y_pred_lin_reg,
             f'{model_description} (Linear Regression)'
         )
 
-        # model parameters
-        save_model_parameters(
-            gbt_lgb_model,
-            f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
-        )
-        save_model_parameters(
-            gbt_xgb_squarederror_model,
-            f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
-        )
-        save_model_parameters(
-            gbt_xgb_absoluteerror_model,
-            f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
-        )
-        save_model_parameters(
-            rf_lgb_model,
-            f'{model_description} (Random Forest, LightGBM)'
-        )
-        save_model_parameters(
-            mlp_model,
-            f'{model_description} (Multi Layer Perceptron)'
-        )
+        # # model parameters
+        # save_model_parameters(
+        #     gbt_lgb_model,
+        #     f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
+        # )
+        # save_model_parameters(
+        #     gbt_xgb_squarederror_model,
+        #     f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
+        # )
+        # save_model_parameters(
+        #     gbt_xgb_absoluteerror_model,
+        #     f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
+        # )
+        # save_model_parameters(
+        #     rf_lgb_model,
+        #     f'{model_description} (Random Forest, LightGBM)'
+        # )
+        # save_model_parameters(
+        #     mlp_model,
+        #     f'{model_description} (Multi Layer Perceptron)'
+        # )
         save_model_parameters(
             lin_reg_model,
             f'{model_description} (Linear Regression)'
         )
 
-        # shap feature importance
-        gbt_lgb_explainer = shap.Explainer(gbt_lgb_model)
-        gbt_xgb_squarederror_explainer = shap.Explainer(gbt_xgb_squarederror_model)
-        gbt_xgb_absoluteerror_explainer = shap.Explainer(gbt_xgb_absoluteerror_model)
-        rf_lgb_explainer = shap.Explainer(rf_lgb_model)
-        # The MLP explainer is currently not implemented due to a large computing time
-        # mlp_explainer = shap.KernelExplainer(mlp_model.predict, impute_scale(X_train))
+        '''Don't calculate SHAP values for now'''
+        # # shap feature importance
+        # gbt_lgb_explainer = shap.Explainer(gbt_lgb_model)
+        # gbt_xgb_squarederror_explainer = shap.Explainer(gbt_xgb_squarederror_model)
+        # gbt_xgb_absoluteerror_explainer = shap.Explainer(gbt_xgb_absoluteerror_model)
+        # rf_lgb_explainer = shap.Explainer(rf_lgb_model)
+        # # The MLP explainer is currently not implemented due to a large computing time
+        # # mlp_explainer = shap.KernelExplainer(mlp_model.predict, impute_scale(X_train))
 
-        # save shap explainers
-        path_prefix = f'../results/{files_prefix}explainers/{area}_detrended_{target}'
-        with open(f'{path_prefix}_gbt_lgb_shap_values', 'wb') as file:
-            jbl.dump(gbt_lgb_explainer, file)
-        with open(f'{path_prefix}_gbt_xgb_squarederror_shap_values', 'wb') as file:
-            jbl.dump(gbt_xgb_squarederror_explainer, file)
-        with open(f'{path_prefix}_gbt_xgb_absoluteerror_shap_values', 'wb') as file:
-            jbl.dump(gbt_xgb_absoluteerror_explainer, file)
-        with open(f'{path_prefix}_rf_lgb_shap_values', 'wb') as file:
-            jbl.dump(rf_lgb_explainer, file)
-        # The MLP explainer is currently not implemented due to a large computing time
-        # with open(f'{path_prefix}_mlp_shap_values', 'wb') as file:
-        # jbl.dump(mlp_explainer, file)
+        # # save shap explainers
+        # path_prefix = f'../results/{files_prefix}explainers/{area}_detrended_{target}'
+        # with open(f'{path_prefix}_gbt_lgb_shap_values', 'wb') as file:
+        #     jbl.dump(gbt_lgb_explainer, file)
+        # with open(f'{path_prefix}_gbt_xgb_squarederror_shap_values', 'wb') as file:
+        #     jbl.dump(gbt_xgb_squarederror_explainer, file)
+        # with open(f'{path_prefix}_gbt_xgb_absoluteerror_shap_values', 'wb') as file:
+        #     jbl.dump(gbt_xgb_absoluteerror_explainer, file)
+        # with open(f'{path_prefix}_rf_lgb_shap_values', 'wb') as file:
+        #     jbl.dump(rf_lgb_explainer, file)
+        # # The MLP explainer is currently not implemented due to a large computing time
+        # # with open(f'{path_prefix}_mlp_shap_values', 'wb') as file:
+        # # jbl.dump(mlp_explainer, file)
 
         # store y values for box plot
         y_complete[f'{target}_true'] = y_test
-        y_complete[f'{target}_gbt_lgb'] = y_pred_gbt_lgb
-        y_complete[f'{target}_gbt_xgb_squarederror'] = y_pred_gbt_xgb_squarederror
-        y_complete[f'{target}_gbt_xgb_absoluteerror'] = y_pred_gbt_xgb_absoluteerror
-        y_complete[f'{target}_rf_lgb'] = y_pred_rf_lgb
-        y_complete[f'{target}_mlp'] = y_pred_mlp
+        # y_complete[f'{target}_gbt_lgb'] = y_pred_gbt_lgb
+        # y_complete[f'{target}_gbt_xgb_squarederror'] = y_pred_gbt_xgb_squarederror
+        # y_complete[f'{target}_gbt_xgb_absoluteerror'] = y_pred_gbt_xgb_absoluteerror
+        # y_complete[f'{target}_rf_lgb'] = y_pred_rf_lgb
+        # y_complete[f'{target}_mlp'] = y_pred_mlp
         y_complete[f'{target}_lin_reg'] = y_pred_lin_reg
 
         # store y values for all the data
         y_complete_all[f'{target}_true_all'] = y
-        y_complete_all[f'{target}_gbt_lgb_all'] = gbt_lgb_model.predict(
-            X.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X
-        )
-        y_complete_all[f'{target}_gbt_xgb_squarederror_all'] = gbt_xgb_squarederror_model.predict(
-            X.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X
-        )
-        y_complete_all[f'{target}_gbt_xgb_absoluteerror_all'] = gbt_xgb_absoluteerror_model.predict(
-            X.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X
-        )
-        y_complete_all[f'{target}_rf_lgb_all'] = rf_lgb_model.predict(
-            X.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X
-        )
-        y_complete_all[f'{target}_mlp_all'] = mlp_model.predict(
-            impute_scale(X.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X
-                         ))
-        y_complete_all[f'{target}_lin_reg_all'] = lin_reg_model.predict(
+        # y_complete_all[f'{target}_gbt_lgb_all'] = gbt_lgb_model.predict(
+        #     X.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X
+        # )
+        # y_complete_all[f'{target}_gbt_xgb_squarederror_all'] = gbt_xgb_squarederror_model.predict(
+        #     X.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X
+        # )
+        # y_complete_all[f'{target}_gbt_xgb_absoluteerror_all'] = gbt_xgb_absoluteerror_model.predict(
+        #     X.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X
+        # )
+        # y_complete_all[f'{target}_rf_lgb_all'] = rf_lgb_model.predict(
+        #     X.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X
+        # )
+        # y_complete_all[f'{target}_mlp_all'] = mlp_model.predict(
+        #     impute_scale(X.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X
+        #                  ))
+        y_complete_all[f'{target}_lin_reg_all'] = lin_reg_model.predict(impute_scale(
             X.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X
-        )
+        ))
 
     # save all predictions and true values
     y_complete.to_hdf(f'../results/{files_prefix}predictions/{area}_detrended_predictions.h5', key='df', mode='w')
