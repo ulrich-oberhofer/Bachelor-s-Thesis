@@ -1,18 +1,44 @@
 
-AUS: Detrended Drift (Linear Regression)
-copy_X: True
-fit_intercept: True
-positive: False
-
-AUS: Detrended Diffusion (Linear Regression)
-copy_X: True
-fit_intercept: True
-positive: False
+CE: Detrended Drift (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+boosting_type: gbdt
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.0763727111214849
+max_depth: 4
+min_child_samples: 79
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 205
+num_leaves: 39
+random_state: 42
+reg_alpha: 0.04106751676787579
+reg_lambda: 0.39882090144479454
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
 
 CE: Detrended Drift (Linear Regression)
 copy_X: True
 fit_intercept: True
 positive: False
+
+CE: Detrended Diffusion (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+boosting_type: gbdt
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.22355389431312817
+max_depth: 6
+min_child_samples: 32
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 844
+num_leaves: 12
+random_state: 42
+reg_alpha: 0.006952130531190703
+reg_lambda: 0.5107473025775657
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
 
 CE: Detrended Diffusion (Linear Regression)
 copy_X: True

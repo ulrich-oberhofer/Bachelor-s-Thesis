@@ -14,22 +14,27 @@ from scipy.stats import uniform, randint
 
 # MLP imports
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.neural_network import MLPRegressor
 import sys
 sys.path.append('..')
 from utils import ml_parameters
 from utils import settings as s
-
+import csv
 # define global imputer and scaler for preprocessing
 imp = SimpleImputer(missing_values=np.nan, strategy='mean')
 min_max_scaler = MinMaxScaler()
+standard_scaler = StandardScaler()
 
 
 def fit_linear_regression(X_train: np.array, y_train: np.array) -> np.array:
     from sklearn.linear_model import LinearRegression
     model = LinearRegression()
     model.fit(X_train, y_train)
+    print('max and min: ', np.max(X_train), np.min(X_train))
+    print('not nans: ', np.count_nonzero(~np.isnan(X_train)))
+    print('nans: ', np.count_nonzero(np.isnan(X_train)))
+
     return model
 
 def fit_gbdt_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_search: bool) -> lgb.LGBMRegressor:
@@ -57,7 +62,7 @@ def fit_gbdt_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_se
 
         random_search.fit(X_train, y_train)
         best_parameters = random_search.best_estimator_.get_params()
-
+        print('best parameters: ', best_parameters)
     # fit model
     model = lgb.LGBMRegressor(
         random_state=42,
@@ -186,6 +191,7 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
                 solver='adam',
                 learning_rate='constant',
                 max_iter=100,
+                early_stopping=True # added early stopping to prevent overfitting
             ),
             param_grid=params,
             cv=5,
@@ -211,17 +217,31 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
 
 
 def impute_scale(x: np.array) -> np.array:
-    x = imp.transform(x)
-    x = min_max_scaler.transform(x)
+    # x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
+    
+    #x = min_max_scaler.transform(x)
+    x = standard_scaler.transform(x)
+    return x
+
+def impute_scale_standard(x: np.array) -> np.array: #!!! newly added
+    # x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
+    x = standard_scaler.transform(x)
     return x
 
 
-def evaluate_model(y_true: np.array, y_pred: np.array, model_type: str) -> None:
+def evaluate_model(y_true: np.array, y_pred: np.array, model_type: str, dict_eval = None) -> None:
     mse = mean_squared_error(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
     mape = mean_absolute_percentage_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
 
+    if dict_eval is not None:
+        dict_eval[model_type] = {
+            'Mean Squared Error': mse,
+            'Mean Absolute Error': mae,
+            'Mean Absolute Percentage Error': mape,
+            'r2-Score': r2
+        }
     with open(f'../results/{files_prefix}model_errors_v3.txt', mode='a') as file:
         file.write(f'\n{model_type}\n')
         file.write(f'Mean Squared Error: {mse}\n')
@@ -250,7 +270,9 @@ elif s.ml['knockout']:
 open(f'../results/{files_prefix}model_parameters_v3.txt', 'w').close()
 open(f'../results/{files_prefix}model_errors_v3.txt', 'w').close()
 
-for area in ['AUS', 'CE']:
+dict_eval = {}
+for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
+    dict_eval[area] = {}
     y_complete = pd.DataFrame()
     y_complete_all = pd.DataFrame()
 
@@ -263,25 +285,34 @@ for area in ['AUS', 'CE']:
         np.random.seed(42)
         X['random_noise'] = np.random.rand(X.shape[0])
 
+    print('Share of nans: ', X.isna().any(axis=1).sum()/len(X))
     for target in ['drift', 'diffusion']:
+        dict_eval[area][target] = {}
         y = data[target]
+
+        ''' !!! ADDITION: Keep only data without NaNs'''
+        valid_ind = ~pd.concat([X, y], axis=1).isnull().any(axis=1)
+        X, y = X[valid_ind], y[valid_ind]
 
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=s.ml['test size'], random_state=42
         )
-
+        
         # fit imputer and scaler
         imp.fit(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train)
         min_max_scaler.fit(X_train.drop(columns=s.top_features[area][target]['mlp']).values if s.ml[
             'knockout'] else X_train.values)
+        standard_scaler.fit(X_train.drop(columns=s.top_features[area][target]['mlp']).values if s.ml[
+            'knockout'] else X_train.values)
+        
 
         # # fit models (gbt: gradient boosted tree, rf: random forest, mlp: multi layer perceptron)
-        # gbt_lgb_model = fit_gbdt_lgb(
-        #     X_train.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_train,
-        #     y_train,
-        #     ml_parameters.parameters_v3[area][target]['gbt_lgb'],
-        #     s.ml['random search gbt_lgb']
-        # )
+        gbt_lgb_model = fit_gbdt_lgb(
+            X_train.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_train,
+            y_train,
+            ml_parameters.parameters_v3[area][target]['gbt_lgb'],
+            s.ml['random search gbt_lgb']
+        )
         # gbt_xgb_squarederror_model = fit_xgb(
         #     X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
         #         'knockout'] else X_train,
@@ -305,21 +336,21 @@ for area in ['AUS', 'CE']:
         #     s.ml['random search rf_lgb']
         # )
         # mlp_model = fit_mlp(
-        #     impute_scale(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train),
+        #     impute_scale_standard(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train), #!!!
         #     y_train,
         #     ml_parameters.parameters_v3[area][target]['mlp'],
-        #     s.ml['grid search mlp']
+        #     do_grid_search=True # s.ml['grid search mlp']
         # )
         lin_reg_model = fit_linear_regression(
             impute_scale(X_train.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_train),
             y_train
         )
 
-
-        # # predict models
-        # y_pred_gbt_lgb = gbt_lgb_model.predict(
-        #     X_test.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_test
-        # )
+        #!!! min_max_scaler might be missing here!
+        # predict models
+        y_pred_gbt_lgb = gbt_lgb_model.predict(
+            X_test.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_test
+        )
         # y_pred_gbt_xgb_squarederror = gbt_xgb_squarederror_model.predict(
         #     X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test
         # )
@@ -329,7 +360,7 @@ for area in ['AUS', 'CE']:
         # y_pred_rf_lgb = rf_lgb_model.predict(
         #     X_test.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_test
         # )
-        # y_pred_mlp = mlp_model.predict(impute_scale(
+        # y_pred_mlp = mlp_model.predict(impute_scale_standard( #!!!
         #     X_test.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_test
         # ))
         y_pred_lin_reg = lin_reg_model.predict(impute_scale(
@@ -338,10 +369,10 @@ for area in ['AUS', 'CE']:
 
         # evaluate models
         model_description = f'{area}: Detrended {target.capitalize()}'
-        # evaluate_model(
-        #     y_test, y_pred_gbt_lgb,
-        #     f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
-        # )
+        evaluate_model(
+            y_test, y_pred_gbt_lgb,
+            f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
+        )
         # evaluate_model(
         #     y_test, y_pred_gbt_xgb_squarederror,
         #     f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
@@ -360,14 +391,15 @@ for area in ['AUS', 'CE']:
         # )
         evaluate_model(
             y_test, y_pred_lin_reg,
-            f'{model_description} (Linear Regression)'
+            f'{model_description} (Linear Regression)',
+            dict_eval[area][target]
         )
 
         # # model parameters
-        # save_model_parameters(
-        #     gbt_lgb_model,
-        #     f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
-        # )
+        save_model_parameters(
+            gbt_lgb_model,
+            f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
+        )
         # save_model_parameters(
         #     gbt_xgb_squarederror_model,
         #     f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
@@ -411,10 +443,11 @@ for area in ['AUS', 'CE']:
         # # The MLP explainer is currently not implemented due to a large computing time
         # # with open(f'{path_prefix}_mlp_shap_values', 'wb') as file:
         # # jbl.dump(mlp_explainer, file)
+        ''' End of SHAP calue calculation'''
 
         # store y values for box plot
         y_complete[f'{target}_true'] = y_test
-        # y_complete[f'{target}_gbt_lgb'] = y_pred_gbt_lgb
+        y_complete[f'{target}_gbt_lgb'] = y_pred_gbt_lgb
         # y_complete[f'{target}_gbt_xgb_squarederror'] = y_pred_gbt_xgb_squarederror
         # y_complete[f'{target}_gbt_xgb_absoluteerror'] = y_pred_gbt_xgb_absoluteerror
         # y_complete[f'{target}_rf_lgb'] = y_pred_rf_lgb
@@ -423,9 +456,9 @@ for area in ['AUS', 'CE']:
 
         # store y values for all the data
         y_complete_all[f'{target}_true_all'] = y
-        # y_complete_all[f'{target}_gbt_lgb_all'] = gbt_lgb_model.predict(
-        #     X.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X
-        # )
+        y_complete_all[f'{target}_gbt_lgb_all'] = gbt_lgb_model.predict(
+            X.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X
+        )
         # y_complete_all[f'{target}_gbt_xgb_squarederror_all'] = gbt_xgb_squarederror_model.predict(
         #     X.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X
         # )
@@ -436,14 +469,21 @@ for area in ['AUS', 'CE']:
         #     X.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X
         # )
         # y_complete_all[f'{target}_mlp_all'] = mlp_model.predict(
-        #     impute_scale(X.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X
+        #     impute_scale_standard(X.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X #!!!
         #                  ))
-        y_complete_all[f'{target}_lin_reg_all'] = lin_reg_model.predict(impute_scale(
-            X.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X
+        y_complete_all[f'{target}_lin_reg_all'] = lin_reg_model.predict(
+            impute_scale(X.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X
         ))
-
     # save all predictions and true values
     y_complete.to_hdf(f'../results/{files_prefix}predictions/{area}_detrended_predictions.h5', key='df', mode='w')
     y_complete_all.to_hdf(
         f'../results/{files_prefix}predictions/{area}_detrended_all_predictions.h5', key='df', mode='w'
     )
+
+# dict_eval.to_csv(f'../results/dict_{files_prefix}model_errors_v3.csv')
+# with open(f'../results/dict_{files_prefix}model_errors_v3.csv', 'w') as csv_file:  
+#     writer = csv.writer(csv_file)
+#     for key, value in dict_eval.items():
+#        writer.writerow([key, value])
+(pd.DataFrame.from_dict(data=dict_eval, orient='index')
+   .to_json(f'../results/dict_model_errors_v3.json'))

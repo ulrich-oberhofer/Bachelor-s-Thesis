@@ -3,6 +3,8 @@
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+import sys
+sys.path.append('..')
 
 # Library for the gaussian kernel filter
 from scipy.ndimage import gaussian_filter1d
@@ -20,7 +22,7 @@ histogram_bins = {
 
 def plot_frequency(data: pd.DataFrame, country: str) -> None:
     fig, ax = plt.subplots(2, 1)
-    fig.suptitle(f'Frequency statistics of {s.settings[country]['name']}', fontsize=s.plotting['title size'])
+    #fig.suptitle(f'Frequency statistics of {s.settings[country]['name']}', fontsize=s.plotting['title size'])
     fig.set_figwidth(10)
     fig.set_figheight(5)
 
@@ -42,37 +44,64 @@ def plot_frequency(data: pd.DataFrame, country: str) -> None:
     plt.savefig(f'../results/km/plots/frequency/{country}_frequency.pdf')
 
 
-for area in ['AUS', 'CE']:
+for area in ['CE']: #['AUS', 'CE'] !!! just for CE at the moment
     print(f"Calculating drift and diffusion for {s.settings[area]['name']}")
     freq = get_frequency_data(area)
+
     plot_frequency(freq, area)
     angular_freq = to_angular_freq(freq, area)
 
+    '''These functions serve for the alternative calculation of the drift and diffusion'''
+    def fun_drift(df):
+        drift, space = km_get_drift(
+            df['frequency'], s.km[area]['drift bw'], s.km[area]['delta_t']
+        )
+        return km_get_primary_control(drift, space)
+    def fun_diffusion(df):
+        return km_get_diffusion(
+            df['frequency'], s.km[area]['diffusion bw'], s.km[area]['delta_t']
+        )
+
     for datatype in ['detrended', 'original']:
-        frequency = angular_freq['frequency']
+        # frequency = angular_freq['frequency']
 
-        # frequency measurements/values per hour
-        vph = s.settings[area]['values per hour']
-        hours = frequency.size // vph
-        drifts = np.empty(hours)
-        diffusions = np.empty(hours)
+        # # frequency measurements/values per hour
+        # vph = s.settings[area]['values per hour']
+        # hours = frequency.size // vph
+        # drifts = np.empty(hours)
+        # diffusions = np.empty(hours)
 
-        # detrend data
+        # # detrend data
+        # if datatype == 'detrended':
+        #     data_filter = gaussian_filter1d(frequency, sigma=s.settings[area]['detrend sigma'])
+        #     frequency = frequency - data_filter
+
+        # # calculate the drift and diffusion for each hour
+        # for i in range(hours):
+        #     drift, space = km_get_drift(
+        #         frequency[vph * i:vph * i + vph], s.km[area]['drift bw'], s.km[area]['delta_t']
+        #     )
+        #     drifts[i] = km_get_primary_control(drift, space)
+        #     diffusions[i] = km_get_diffusion(
+        #         frequency[vph * i:vph * i + vph], s.km[area]['diffusion bw'], s.km[area]['delta_t']
+        #     )
+
+        '''Alternative calculation of drift and diffusion'''
+        df = angular_freq
+        df_grouped = df.groupby('hour')
+        frequency = df['frequency'] 
         if datatype == 'detrended':
             data_filter = gaussian_filter1d(frequency, sigma=s.settings[area]['detrend sigma'])
             frequency = frequency - data_filter
+            df['frequency'] = frequency
+        drift = df_grouped.apply(fun_drift)
+        diffusion = df_grouped.apply(fun_diffusion)
 
-        # calculate the drift and diffusion for each hour
-        for i in range(hours):
-            drift, space = km_get_drift(
-                frequency[vph * i:vph * i + vph], s.km[area]['drift bw'], s.km[area]['delta_t']
-            )
-            drifts[i] = km_get_primary_control(drift, space)
-            diffusions[i] = km_get_diffusion(
-                frequency[vph * i:vph * i + vph], s.km[area]['diffusion bw'], s.km[area]['delta_t']
-            )
+
 
         # store the results
-        index = angular_freq['hour'].unique()
-        drift_diffusion = pd.DataFrame({'drift': drifts, 'diffusion': diffusions}, index=index)
+        # index = angular_freq['hour'].unique()
+        # drift_diffusion = pd.DataFrame({'drift': drifts, 'diffusion': diffusions}, index=index)
+        '''Alternative: '''
+        drift_diffusion = pd.concat([drift, diffusion], axis=1, keys=['drift', 'diffusion'])
         drift_diffusion.to_hdf(f'../results/km/{area}_{datatype}_drift_diffusion.h5', key='df', mode='w')

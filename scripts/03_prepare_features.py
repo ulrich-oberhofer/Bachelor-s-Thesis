@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import FunctionTransformer
-
+import sys
+sys.path.append('..')
 from utils import settings as s
 
 
@@ -25,8 +26,10 @@ def get_feature_data(country: str) -> pd.DataFrame:
         input_actual = pd.read_hdf('../data/[feature_data]/CE/input_actual.h5')
         input_forecast = pd.read_hdf('../data/[feature_data]/CE/input_forecast.h5')
         feature_data = pd.concat([input_actual, input_forecast], axis=1)
+        feature_data.index = feature_data.index #- pd.Timedelta(hours=2) # !!! just for testing !!!
         # align with frequency data timestamps
-        feature_data.index = feature_data.index.tz_localize(None) - pd.Timedelta(hours=2)
+        ### feature_data.index = feature_data.index.tz_localize(None) - pd.Timedelta(hours=2) #!!! makes no  sense in my opinion
+        #feature_data.index = feature_data.index.tz_localize(None).tz_localize('CET', ambiguous=True)
         feature_data.drop(columns=['month', 'weekday', 'hour'], inplace=True)
 
     else:
@@ -64,7 +67,7 @@ def filter_outliers(feature_data: pd.DataFrame, outlier_percent: float) -> pd.Da
     return feature_data
 
 
-for area in ['AUS', 'CE']:
+for area in ['CE']: #['AUS', 'CE']
 
     features = get_feature_data(area)
     features = add_time_features(features)
@@ -74,10 +77,12 @@ for area in ['AUS', 'CE']:
         features.dropna(subset=['Wind'], inplace=True)
 
     # add drift and diffusion to features to create one file for each model
-    for datatype in ['detrended', 'original']:
+    for datatype in ['detrended']: #!!! 'original' still to do with timestapms !!!
 
         targets = pd.read_hdf(f'../results/km/{area}_{datatype}_drift_diffusion.h5')
-
+        print(features.index)
+        print(targets.index)
         combined = features.join(targets, how='inner')
         combined = filter_outliers(combined, s.settings[area]['outlier percent'])
         combined.to_hdf(f'../results/prepared_features/{area}_{datatype}_ml.h5', key='df', mode='w')
+        

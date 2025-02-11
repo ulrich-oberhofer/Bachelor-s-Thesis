@@ -14,14 +14,14 @@ settings = {
         'reference frequency': 50,     # reference frequency of the area
         'values per hour': 900,        # number of values of the time series for a full hour
         'detrend sigma': 15,           # gaussian filter sigma used for detrending
-        'outlier percent': 1           # percent of outliers that is filtered out
+        'outlier percent': 0 # 1           # percent of outliers that is filtered out #!!! seems not necessary
     },
     'CE': {
         'name': 'Continental Europe',  # full name of the area
         'reference frequency': 50,     # reference frequency of the area
         'values per hour': 3600,       # number of values of the time series for a full hour
         'detrend sigma': 60,           # gaussian filter sigma used for detrending
-        'outlier percent': 2           # percent of outliers that is filtered out
+        'outlier percent': 0 # 2           # percent of outliers that is filtered out #!!! seems not necessary
     }
 }
 
@@ -56,12 +56,12 @@ ml = {
     'random noise': False,                         # Add random noise feature to models
     'knockout': False,                             # Knockout the most important feature (config below)
     'test size': 0.2,                              # Test size for Machine Learning models
-    'random search gbt_lgb': False,                # Perform random search: Gradient Boosted Trees, LightGBM
+    'random search gbt_lgb': True,                # Perform random search: Gradient Boosted Trees, LightGBM
     'random search gbt_xgb_squarederror': False,   # Perform random search: Gradient Boosted Trees, XGBoost, Squared Error
     'random search gbt_xgb_absoluteerror': False,  # Perform random search: Gradient Boosted Trees, XGBoost, Absolute Error
     'random search rf_lgb': False,                 # Perform random search: Random Forest, LightGBM
     'grid search mlp': False,                      # Perform grid search: Multi Layer Perceptron
-    'random search iterations': 1000,              # number of iterations for the random search
+    'random search iterations': 100, # !!! 1000              # number of iterations for the random search
 }
 
 top_features = {

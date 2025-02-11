@@ -14,8 +14,10 @@ def get_frequency_data(country: str) -> pd.DataFrame:
         df = pd.read_hdf('../data/AUS_cleansed_frequency_data.h5')
 
     elif country == 'CE':
-        ce_data = h5py.File('../data/CE_cleansed_2015-01-01_to_2019-12-31.h5', 'r')['df']
-        df = pd.DataFrame({'timestamp': ce_data['index'], 'frequency': ce_data['values']})
+        # ce_data = h5py.File(f'../data/CE_cleansed_2015-01-01_to_2019-12-31.h5', 'r')['df']
+        # df = pd.DataFrame({'timestamp': ce_data['index'], 'frequency': ce_data['values']})
+        ce_data = pd.read_hdf(f'../data/cleansed_2015-01-01_to_2019-12-31.h5', key='df') #!!! this is added	
+        df = pd.DataFrame({'timestamp': ce_data.index, 'frequency': ce_data.values}) #!!! this is added	
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df.dropna(how='any', inplace=True)
         # remove data before dip in drift dip at 2017-01-25 04:00:00,
@@ -27,13 +29,17 @@ def get_frequency_data(country: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     # add datetime rounded down to hour to each datapoint
-    df['hour'] = df['timestamp'].dt.floor('h')
+    df['hour'] = df['timestamp'].dt.floor('h', ambiguous=True) #!!! ambiguous=True is added; with this method, we lose at the moment the hours of time changing (DST) !!!
 
-    # Group by date and hour and filter out hours that don't have enough data points
+    # Group by date and hour and filter out hours that don't have enough data points # !!! replaced !!!
     hourly_amount = df.groupby('hour').size()
     uninterrupted_hours_index = hourly_amount[hourly_amount == s.settings[country]['values per hour']].index
     df = df[df['hour'].isin(uninterrupted_hours_index)]
-
+    # Alternatively:
+    # df.set_index('timestamp', inplace=True)
+    # df_grouped = df.groupby('hour')
+    # df = df_grouped.filter(lambda x: len(x) == 3600)
+    # df['timestamp'] = df.index
     return df
 
 

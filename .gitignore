@@ -23,3 +23,12 @@
 
 # Plots of utils
 /results/utils
+
+epoch=*
+wandb-*
+*.wandb
+debu*
+*.log
+*.yaml
+config-*
+scripts/wandb/*/files/requirements.txt

@@ -8,3 +8,6 @@ scikit_learn
 scipy
 matplotlib
 kramersmoyal
+torch 
+pytorch-lightning
+wandb
