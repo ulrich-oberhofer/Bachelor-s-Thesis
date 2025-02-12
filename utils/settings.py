@@ -56,7 +56,7 @@ ml = {
     'random noise': False,                         # Add random noise feature to models
     'knockout': False,                             # Knockout the most important feature (config below)
     'test size': 0.2,                              # Test size for Machine Learning models
-    'random search gbt_lgb': True,                # Perform random search: Gradient Boosted Trees, LightGBM
+    'random search gbt_lgb': False,                # Perform random search: Gradient Boosted Trees, LightGBM
     'random search gbt_xgb_squarederror': False,   # Perform random search: Gradient Boosted Trees, XGBoost, Squared Error
     'random search gbt_xgb_absoluteerror': False,  # Perform random search: Gradient Boosted Trees, XGBoost, Absolute Error
     'random search rf_lgb': False,                 # Perform random search: Random Forest, LightGBM
