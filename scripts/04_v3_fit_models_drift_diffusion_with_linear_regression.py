@@ -52,7 +52,7 @@ def fit_gbdt_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_se
         }
 
         random_search = RandomizedSearchCV(
-            estimator=lgb.LGBMRegressor(random_state=42, boosting_type='gbdt'),
+            estimator=lgb.LGBMRegressor(random_state=42, boosting_type='gbdt', n_jobs=1),
             param_distributions=param_distributions,
             n_iter=s.ml['random search iterations'],
             cv=5,
@@ -63,6 +63,12 @@ def fit_gbdt_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_se
         random_search.fit(X_train, y_train)
         best_parameters = random_search.best_estimator_.get_params()
         print('best parameters: ', best_parameters)
+        # save best parameters
+        with open(f'../results/{files_prefix}gbdt_lgb.txt', mode='a') as file:
+            writer = csv.writer(file)
+            for key, value in best_parameters.items():
+                writer.writerow([key, value])
+
     # fit model
     model = lgb.LGBMRegressor(
         random_state=42,
@@ -217,14 +223,14 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
 
 
 def impute_scale(x: np.array) -> np.array:
-    # x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
+    x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
     
     #x = min_max_scaler.transform(x)
     x = standard_scaler.transform(x)
     return x
 
 def impute_scale_standard(x: np.array) -> np.array: #!!! newly added
-    # x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
+    x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
     x = standard_scaler.transform(x)
     return x
 
@@ -290,9 +296,9 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         dict_eval[area][target] = {}
         y = data[target]
 
-        ''' !!! ADDITION: Keep only data without NaNs'''
-        valid_ind = ~pd.concat([X, y], axis=1).isnull().any(axis=1)
-        X, y = X[valid_ind], y[valid_ind]
+        # ''' !!! ADDITION: Keep only data without NaNs'''
+        # valid_ind = ~pd.concat([X, y], axis=1).isnull().any(axis=1)
+        # X, y = X[valid_ind], y[valid_ind]
 
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=s.ml['test size'], random_state=42
@@ -313,28 +319,28 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             ml_parameters.parameters_v3[area][target]['gbt_lgb'],
             s.ml['random search gbt_lgb']
         )
-        # gbt_xgb_squarederror_model = fit_xgb(
-        #     X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
-        #         'knockout'] else X_train,
-        #     y_train,
-        #     ml_parameters.parameters_v3[area][target]['gbt_xgb_squarederror'],
-        #     'reg:squarederror',
-        #     s.ml['random search gbt_xgb_squarederror']
-        # )
-        # gbt_xgb_absoluteerror_model = fit_xgb(
-        #     X_train.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml[
-        #         'knockout'] else X_train,
-        #     y_train,
-        #     ml_parameters.parameters_v3[area][target]['gbt_xgb_absoluteerror'],
-        #     'reg:absoluteerror',
-        #     s.ml['random search gbt_xgb_absoluteerror']
-        # )
-        # rf_lgb_model = fit_rf_lgb(
-        #     X_train.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_train,
-        #     y_train,
-        #     ml_parameters.parameters_v3[area][target]['rf_lgb'],
-        #     s.ml['random search rf_lgb']
-        # )
+        gbt_xgb_squarederror_model = fit_xgb(
+            X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
+                'knockout'] else X_train,
+            y_train,
+            ml_parameters.parameters_v3[area][target]['gbt_xgb_squarederror'],
+            'reg:squarederror',
+            s.ml['random search gbt_xgb_squarederror']
+        )
+        gbt_xgb_absoluteerror_model = fit_xgb(
+            X_train.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml[
+                'knockout'] else X_train,
+            y_train,
+            ml_parameters.parameters_v3[area][target]['gbt_xgb_absoluteerror'],
+            'reg:absoluteerror',
+            s.ml['random search gbt_xgb_absoluteerror']
+        )
+        rf_lgb_model = fit_rf_lgb(
+            X_train.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_train,
+            y_train,
+            ml_parameters.parameters_v3[area][target]['rf_lgb'],
+            s.ml['random search rf_lgb']
+        )
         # mlp_model = fit_mlp(
         #     impute_scale_standard(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train), #!!!
         #     y_train,
@@ -351,15 +357,15 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         y_pred_gbt_lgb = gbt_lgb_model.predict(
             X_test.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_test
         )
-        # y_pred_gbt_xgb_squarederror = gbt_xgb_squarederror_model.predict(
-        #     X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test
-        # )
-        # y_pred_gbt_xgb_absoluteerror = gbt_xgb_absoluteerror_model.predict(
-        #     X_test.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_test
-        # )
-        # y_pred_rf_lgb = rf_lgb_model.predict(
-        #     X_test.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_test
-        # )
+        y_pred_gbt_xgb_squarederror = gbt_xgb_squarederror_model.predict(
+            X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test
+        )
+        y_pred_gbt_xgb_absoluteerror = gbt_xgb_absoluteerror_model.predict(
+            X_test.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_test
+        )
+        y_pred_rf_lgb = rf_lgb_model.predict(
+            X_test.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_test
+        )
         # y_pred_mlp = mlp_model.predict(impute_scale_standard( #!!!
         #     X_test.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_test
         # ))
@@ -373,18 +379,18 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             y_test, y_pred_gbt_lgb,
             f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
         )
-        # evaluate_model(
-        #     y_test, y_pred_gbt_xgb_squarederror,
-        #     f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
-        # )
-        # evaluate_model(
-        #     y_test, y_pred_gbt_xgb_absoluteerror,
-        #     f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
-        # )
-        # evaluate_model(
-        #     y_test, y_pred_rf_lgb,
-        #     f'{model_description} (Random Forest, LightGBM)'
-        # )
+        evaluate_model(
+            y_test, y_pred_gbt_xgb_squarederror,
+            f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
+        )
+        evaluate_model(
+            y_test, y_pred_gbt_xgb_absoluteerror,
+            f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
+        )
+        evaluate_model(
+            y_test, y_pred_rf_lgb,
+            f'{model_description} (Random Forest, LightGBM)'
+        )
         # evaluate_model(
         #     y_test, y_pred_mlp,
         #     f'{model_description} (Multi Layer Perceptron)'
@@ -400,18 +406,18 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             gbt_lgb_model,
             f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
         )
-        # save_model_parameters(
-        #     gbt_xgb_squarederror_model,
-        #     f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
-        # )
-        # save_model_parameters(
-        #     gbt_xgb_absoluteerror_model,
-        #     f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
-        # )
-        # save_model_parameters(
-        #     rf_lgb_model,
-        #     f'{model_description} (Random Forest, LightGBM)'
-        # )
+        save_model_parameters(
+            gbt_xgb_squarederror_model,
+            f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
+        )
+        save_model_parameters(
+            gbt_xgb_absoluteerror_model,
+            f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
+        )
+        save_model_parameters(
+            rf_lgb_model,
+            f'{model_description} (Random Forest, LightGBM)'
+        )
         # save_model_parameters(
         #     mlp_model,
         #     f'{model_description} (Multi Layer Perceptron)'
@@ -448,9 +454,9 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         # store y values for box plot
         y_complete[f'{target}_true'] = y_test
         y_complete[f'{target}_gbt_lgb'] = y_pred_gbt_lgb
-        # y_complete[f'{target}_gbt_xgb_squarederror'] = y_pred_gbt_xgb_squarederror
-        # y_complete[f'{target}_gbt_xgb_absoluteerror'] = y_pred_gbt_xgb_absoluteerror
-        # y_complete[f'{target}_rf_lgb'] = y_pred_rf_lgb
+        y_complete[f'{target}_gbt_xgb_squarederror'] = y_pred_gbt_xgb_squarederror
+        y_complete[f'{target}_gbt_xgb_absoluteerror'] = y_pred_gbt_xgb_absoluteerror
+        y_complete[f'{target}_rf_lgb'] = y_pred_rf_lgb
         # y_complete[f'{target}_mlp'] = y_pred_mlp
         y_complete[f'{target}_lin_reg'] = y_pred_lin_reg
 
@@ -459,15 +465,15 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         y_complete_all[f'{target}_gbt_lgb_all'] = gbt_lgb_model.predict(
             X.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X
         )
-        # y_complete_all[f'{target}_gbt_xgb_squarederror_all'] = gbt_xgb_squarederror_model.predict(
-        #     X.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X
-        # )
-        # y_complete_all[f'{target}_gbt_xgb_absoluteerror_all'] = gbt_xgb_absoluteerror_model.predict(
-        #     X.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X
-        # )
-        # y_complete_all[f'{target}_rf_lgb_all'] = rf_lgb_model.predict(
-        #     X.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X
-        # )
+        y_complete_all[f'{target}_gbt_xgb_squarederror_all'] = gbt_xgb_squarederror_model.predict(
+            X.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X
+        )
+        y_complete_all[f'{target}_gbt_xgb_absoluteerror_all'] = gbt_xgb_absoluteerror_model.predict(
+            X.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X
+        )
+        y_complete_all[f'{target}_rf_lgb_all'] = rf_lgb_model.predict(
+            X.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X
+        )
         # y_complete_all[f'{target}_mlp_all'] = mlp_model.predict(
         #     impute_scale_standard(X.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X #!!!
         #                  ))
