@@ -67,7 +67,7 @@ def filter_outliers(feature_data: pd.DataFrame, outlier_percent: float) -> pd.Da
     return feature_data
 
 
-for area in ['CE']: #['AUS', 'CE']
+for area in ['CE']: #!!! at the moment only for CE !!! ['AUS', 'CE']
 
     features = get_feature_data(area)
     features = add_time_features(features)
