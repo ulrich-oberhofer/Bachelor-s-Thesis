@@ -101,7 +101,7 @@ def fit_rf_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_sear
         }
 
         random_search = RandomizedSearchCV(
-            estimator=lgb.LGBMRegressor(random_state=42, boosting_type='rf'),
+            estimator=lgb.LGBMRegressor(random_state=42, boosting_type='rf', n_jobs=1),
             param_distributions=param_distributions,
             n_iter=s.ml['random search iterations'],
             cv=5,
@@ -145,7 +145,7 @@ def fit_xgb(
         }
 
         random_search = RandomizedSearchCV(
-            estimator=xgb.XGBRegressor(random_state=42, objective=objective),
+            estimator=xgb.XGBRegressor(random_state=42, objective=objective, n_jobs=1),
             param_distributions=param_distributions,
             n_iter=s.ml['random search iterations'],
             cv=5,
@@ -197,7 +197,8 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
                 solver='adam',
                 learning_rate='constant',
                 max_iter=100,
-                early_stopping=True # added early stopping to prevent overfitting
+                early_stopping=True, # added early stopping to prevent overfitting
+                n_jobs=1
             ),
             param_grid=params,
             cv=5,
@@ -223,14 +224,14 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
 
 
 def impute_scale(x: np.array) -> np.array:
-    x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
+    #x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
     
-    #x = min_max_scaler.transform(x)
-    x = standard_scaler.transform(x)
+    x = min_max_scaler.transform(x)
+    #x = standard_scaler.transform(x)
     return x
 
 def impute_scale_standard(x: np.array) -> np.array: #!!! newly added
-    x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
+    #x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
     x = standard_scaler.transform(x)
     return x
 
@@ -296,13 +297,24 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         dict_eval[area][target] = {}
         y = data[target]
 
-        # ''' !!! ADDITION: Keep only data without NaNs'''
-        # valid_ind = ~pd.concat([X, y], axis=1).isnull().any(axis=1)
-        # X, y = X[valid_ind], y[valid_ind]
+        ''' !!! ADDITION: Keep only data without NaNs'''
+        valid_ind = ~pd.concat([X, y], axis=1).isnull().any(axis=1)
+        X, y = X[valid_ind], y[valid_ind]
+
+
+        # block_size = '6h'
+        # masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
+        # train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=7)
+        # X_train = X.loc[pd.concat(train_mask)]
+        # y_train = y.loc[pd.concat(train_mask)]
+        # X_test = X.loc[pd.concat(test_mask)]
+        # y_test = y.loc[pd.concat(test_mask)]
+
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=s.ml['test size'], random_state=42
-        )
+            X, y, test_size=s.ml['test size'], shuffle = True)# random_state=42)
+
+
         
         # fit imputer and scaler
         imp.fit(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train)
@@ -320,8 +332,8 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             s.ml['random search gbt_lgb']
         )
         gbt_xgb_squarederror_model = fit_xgb(
-            X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
-                'knockout'] else X_train,
+            impute_scale(X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
+                'knockout'] else X_train),
             y_train,
             ml_parameters.parameters_v3[area][target]['gbt_xgb_squarederror'],
             'reg:squarederror',
@@ -358,7 +370,7 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             X_test.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_test
         )
         y_pred_gbt_xgb_squarederror = gbt_xgb_squarederror_model.predict(
-            X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test
+            impute_scale(X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test)
         )
         y_pred_gbt_xgb_absoluteerror = gbt_xgb_absoluteerror_model.predict(
             X_test.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_test
@@ -369,8 +381,8 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         # y_pred_mlp = mlp_model.predict(impute_scale_standard( #!!!
         #     X_test.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_test
         # ))
-        y_pred_lin_reg = lin_reg_model.predict(impute_scale(
-            X_test.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_test
+        y_pred_lin_reg = lin_reg_model.predict(
+            impute_scale(X_test.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_test
         ))
 
         # evaluate models
@@ -466,7 +478,7 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             X.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X
         )
         y_complete_all[f'{target}_gbt_xgb_squarederror_all'] = gbt_xgb_squarederror_model.predict(
-            X.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X
+            impute_scale(X.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X)
         )
         y_complete_all[f'{target}_gbt_xgb_absoluteerror_all'] = gbt_xgb_absoluteerror_model.predict(
             X.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X
