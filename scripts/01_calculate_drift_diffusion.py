@@ -48,7 +48,7 @@ for area in ['CE']: #['AUS', 'CE'] !!! just for CE at the moment
     print(f"Calculating drift and diffusion for {s.settings[area]['name']}")
     freq = get_frequency_data(area)
 
-    plot_frequency(freq, area)
+    # plot_frequency(freq, area)
     angular_freq = to_angular_freq(freq, area)
 
     '''These functions serve for the alternative calculation of the drift and diffusion'''
@@ -62,7 +62,7 @@ for area in ['CE']: #['AUS', 'CE'] !!! just for CE at the moment
             df['frequency'], s.km[area]['diffusion bw'], s.km[area]['delta_t']
         )
 
-    for datatype in ['detrended', 'original']:
+    for datatype in ['detrended']:# !!! do only the detrended calculation here !!!, 'original']:
         # frequency = angular_freq['frequency']
 
         # # frequency measurements/values per hour
@@ -88,20 +88,29 @@ for area in ['CE']: #['AUS', 'CE'] !!! just for CE at the moment
 
         '''Alternative calculation of drift and diffusion'''
         df = angular_freq
-        df_grouped = df.groupby('hour')
         frequency = df['frequency'] 
         if datatype == 'detrended':
             data_filter = gaussian_filter1d(frequency, sigma=s.settings[area]['detrend sigma'])
-            frequency = frequency - data_filter
+            frequency = frequency.values - data_filter
             df['frequency'] = frequency
-        drift = df_grouped.apply(fun_drift)
-        diffusion = df_grouped.apply(fun_diffusion)
-
+        # df_grouped = df.groupby('hour')
+        df_resampled = df.resample('h')
+        # drift = df_grouped.apply(fun_drift)
+        # diffusion = df_grouped.apply(fun_diffusion)
+        index = []
+        drift_list = []
+        diffusion_list = []
+        for t,segment in df_resampled:
+            if segment['frequency'].count() == 3600:
+                index.append(t)
+                drift_list.append(fun_drift(segment))
+                diffusion_list.append(fun_diffusion(segment))
+        drift_diffusion = pd.DataFrame({'drift': drift_list, 'diffusion': diffusion_list}, index=pd.to_datetime(index))
 
 
         # store the results
         # index = angular_freq['hour'].unique()
         # drift_diffusion = pd.DataFrame({'drift': drifts, 'diffusion': diffusions}, index=index)
         '''Alternative: '''
-        drift_diffusion = pd.concat([drift, diffusion], axis=1, keys=['drift', 'diffusion'])
+        #drift_diffusion = pd.concat([drift, diffusion], axis=1, keys=['drift', 'diffusion'])
         drift_diffusion.to_hdf(f'../results/km/{area}_{datatype}_drift_diffusion.h5', key='df', mode='w')

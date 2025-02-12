@@ -26,7 +26,7 @@ def get_feature_data(country: str) -> pd.DataFrame:
         input_actual = pd.read_hdf('../data/[feature_data]/CE/input_actual.h5')
         input_forecast = pd.read_hdf('../data/[feature_data]/CE/input_forecast.h5')
         feature_data = pd.concat([input_actual, input_forecast], axis=1)
-        feature_data.index = feature_data.index #- pd.Timedelta(hours=2) # !!! just for testing !!!
+        feature_data.index = feature_data.index - pd.Timedelta(hours=2) # !!! just for testing !!!
         # align with frequency data timestamps
         ### feature_data.index = feature_data.index.tz_localize(None) - pd.Timedelta(hours=2) #!!! makes no  sense in my opinion
         #feature_data.index = feature_data.index.tz_localize(None).tz_localize('CET', ambiguous=True)
