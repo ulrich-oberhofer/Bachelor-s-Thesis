@@ -11,8 +11,10 @@ def get_frequency_data(country: str) -> pd.DataFrame:
     that have no missing measurements
     """
     if country == 'AUS':
-        df = pd.read_hdf('../data/AUS_cleansed_frequency_data.h5')
-
+        #df = pd.read_hdf('../data/AUS_cleansed_frequency_data.h5') #!!! this is replaced
+        df = pd.read_pickle('../data/Mainland_AUS_frequency_data_2021-2024.pkl') #!!! this is added
+        df = pd.DataFrame({'frequency': df})
+        df = df.loc['2023-02-12':'2024-03-24']
     elif country == 'CE':
         # ce_data = h5py.File(f'../data/CE_cleansed_2015-01-01_to_2019-12-31.h5', 'r')['df']
         # df = pd.DataFrame({'timestamp': ce_data['index'], 'frequency': ce_data['values']})
@@ -51,7 +53,7 @@ def get_frequency_data(country: str) -> pd.DataFrame:
     sample = df.resample('h')
     df_full_hours = []
     for t,i in sample:   
-        if i['frequency'].count() == 3600:
+        if i['frequency'].count() == s.settings[country]['values per hour']:
             df_full_hours.append(i)
     df_full_hours = pd.concat(df_full_hours, axis=0)
     df_full_hours.to_pickle(f'../data/{country}_frequency_full_hours.pkl')

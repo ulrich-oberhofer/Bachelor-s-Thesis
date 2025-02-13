@@ -4,7 +4,7 @@ import pandas as pd
 #import shap
 import joblib as jbl
 import sys
-sys.path.append('..')
+sys.path.append('../')
 from utils import settings as s
 
 files_prefix = 'ml_v3/'
@@ -43,22 +43,22 @@ def plot_boxplot(country: str) -> None:
 
     bplot_drift = ax[0].boxplot(
         [data['drift_true'],
-        #  data['drift_gbt_lgb'],
-        #  data['drift_gbt_xgb_squarederror'],
-        #  data['drift_gbt_xgb_absoluteerror'],
-        #  data['drift_rf_lgb'],
-        #  data['drift_mlp'],
+         data['drift_gbt_lgb'],
+         data['drift_gbt_xgb_squarederror'],
+         data['drift_gbt_xgb_absoluteerror'],
+         data['drift_rf_lgb'],
+         data['drift_mlp'],
          data['drift_lin_reg']],
         vert=True, patch_artist=True, labels=labels, medianprops=dict(color='black')
     )
 
     bplot_diffusion = ax[1].boxplot(
         [data['diffusion_true'],
-        #  data['diffusion_gbt_lgb'],
-        #  data['diffusion_gbt_xgb_squarederror'],
-        #  data['diffusion_gbt_xgb_absoluteerror'],
-        #  data['diffusion_rf_lgb'],
-        #  data['diffusion_mlp'],
+         data['diffusion_gbt_lgb'],
+         data['diffusion_gbt_xgb_squarederror'],
+         data['diffusion_gbt_xgb_absoluteerror'],
+         data['diffusion_rf_lgb'],
+         data['diffusion_mlp'],
          data['diffusion_lin_reg']],
         vert=True, patch_artist=True, labels=labels, medianprops=dict(color='black')
     )
@@ -67,8 +67,8 @@ def plot_boxplot(country: str) -> None:
     targets = ['drift', 'diffusion']
     plots = [bplot_drift, bplot_diffusion]
     ml_colors = [
-                # s.plotting['color_gbt_lgb'], s.plotting['color_gbt_xgb_squarederror'],
-                #  s.plotting['color_gbt_xgb_absoluteerror'], s.plotting['color_rf_lgb'], s.plotting['color_mlp'], 
+                s.plotting['color_gbt_lgb'], s.plotting['color_gbt_xgb_squarederror'],
+                 s.plotting['color_gbt_xgb_absoluteerror'], s.plotting['color_rf_lgb'], s.plotting['color_mlp'], 
                 s.plotting['color_lin_reg']]
     for target, bplot in zip(targets, plots):
         color_list = ([s.plotting[f'color {country}'][f'detrended {target}']] + ml_colors)
@@ -135,10 +135,10 @@ def all_predictions(country: str) -> None:
 
         plt.tight_layout()
         plt.savefig(
-            f'../results/{files_prefix}plots/over_time/{country}_{files_prefix.replace('/', '_')}{target}_over_time.png'
+            f'../results/{files_prefix}plots/over_time/{country}_{files_prefix.replace("/", "_")}{target}_over_time.png'
         )
         plt.savefig(
-            f'../results/{files_prefix}plots/over_time/{country}_{files_prefix.replace('/', '_')}{target}_over_time.pdf'
+            f"../results/{files_prefix}plots/over_time/{country}_{files_prefix.replace('/', '_')}{target}_over_time.pdf"
         )
 
 
@@ -198,10 +198,10 @@ def visualize_shap_values(country: str, maxdisplay: int = 11, feature1: int = 1,
         fig.set_figheight(round(maxdisplay * 1.5))
         plt.tight_layout()
         plt.savefig(
-            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace('/', '_')}{target}_shap_beeswarm.png'
+            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace("/", "_")}{target}_shap_beeswarm.png'
         )
         plt.savefig(
-            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace('/', '_')}{target}_shap_beeswarm.pdf'
+            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace("/", "_")}{target}_shap_beeswarm.pdf'
         )
 
         # plot partial dependency plots
@@ -263,10 +263,10 @@ def visualize_shap_values(country: str, maxdisplay: int = 11, feature1: int = 1,
         fig.set_figheight(10)
         plt.tight_layout()
         plt.savefig(
-            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace('/', '_')}{target}_shap_scatter.png'
+            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace("/", "_")}{target}_shap_scatter.png'
         )
         plt.savefig(
-            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace('/', '_')}{target}_shap_scatter.pdf'
+            f'../results/{files_prefix}plots/shap/{country}_{files_prefix.replace("/", "_")}{target}_shap_scatter.pdf'
         )
 
 
@@ -339,7 +339,7 @@ def plot_full_beeswarm_with_random(country: str) -> None:
 
 
 # for area in ['AUS', 'CE']:
-for area in ['CE']:
+for area in ['AUS']: #!!!
     plot_boxplot(area)
     # all_predictions(area)
     # visualize_shap_values(area, 11, 1, 2)

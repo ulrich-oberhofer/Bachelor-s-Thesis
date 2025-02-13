@@ -198,7 +198,6 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
                 learning_rate='constant',
                 max_iter=100,
                 early_stopping=True, # added early stopping to prevent overfitting
-                n_jobs=1
             ),
             param_grid=params,
             cv=5,
@@ -215,8 +214,9 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
         max_iter=100,
         activation=best_parameters['activation'],
         alpha=best_parameters['alpha'],
-        learning_rate_init=best_parameters['learning_rate_init'],
-        hidden_layer_sizes=best_parameters['hidden_layer_sizes'],
+        learning_rate_init=0.00001, #best_parameters['learning_rate_init'],
+        hidden_layer_sizes=(128,264,128,64), #best_parameters['hidden_layer_sizes'],
+        early_stopping=True,
     )
 
     model.fit(X_train, y_train)
@@ -278,7 +278,7 @@ open(f'../results/{files_prefix}model_parameters_v3.txt', 'w').close()
 open(f'../results/{files_prefix}model_errors_v3.txt', 'w').close()
 
 dict_eval = {}
-for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
+for area in ['AUS']: #['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
     dict_eval[area] = {}
     y_complete = pd.DataFrame()
     y_complete_all = pd.DataFrame()
@@ -302,17 +302,17 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         X, y = X[valid_ind], y[valid_ind]
 
 
-        # block_size = '6h'
-        # masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
-        # train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=7)
-        # X_train = X.loc[pd.concat(train_mask)]
-        # y_train = y.loc[pd.concat(train_mask)]
-        # X_test = X.loc[pd.concat(test_mask)]
-        # y_test = y.loc[pd.concat(test_mask)]
+        block_size = '1d'
+        masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
+        train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=200)
+        X_train = X.loc[pd.concat(train_mask)]
+        y_train = y.loc[pd.concat(train_mask)]
+        X_test = X.loc[pd.concat(test_mask)]
+        y_test = y.loc[pd.concat(test_mask)]
 
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=s.ml['test size'], shuffle = True)# random_state=42)
+        # X_train, X_test, y_train, y_test = train_test_split(
+        #     X, y, test_size=s.ml['test size'], shuffle = True, random_state=42)
 
 
         
@@ -353,12 +353,12 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             ml_parameters.parameters_v3[area][target]['rf_lgb'],
             s.ml['random search rf_lgb']
         )
-        # mlp_model = fit_mlp(
-        #     impute_scale_standard(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train), #!!!
-        #     y_train,
-        #     ml_parameters.parameters_v3[area][target]['mlp'],
-        #     do_grid_search=True # s.ml['grid search mlp']
-        # )
+        mlp_model = fit_mlp(
+            impute_scale_standard(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train), #!!!
+            y_train,
+            ml_parameters.parameters_v3[area][target]['mlp'],
+            do_grid_search = s.ml['grid search mlp']
+        )
         lin_reg_model = fit_linear_regression(
             impute_scale(X_train.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_train),
             y_train
@@ -378,9 +378,9 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         y_pred_rf_lgb = rf_lgb_model.predict(
             X_test.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_test
         )
-        # y_pred_mlp = mlp_model.predict(impute_scale_standard( #!!!
-        #     X_test.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_test
-        # ))
+        y_pred_mlp = mlp_model.predict(impute_scale_standard( #!!!
+            X_test.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_test
+        ))
         y_pred_lin_reg = lin_reg_model.predict(
             impute_scale(X_test.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_test
         ))
@@ -403,10 +403,10 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             y_test, y_pred_rf_lgb,
             f'{model_description} (Random Forest, LightGBM)'
         )
-        # evaluate_model(
-        #     y_test, y_pred_mlp,
-        #     f'{model_description} (Multi Layer Perceptron)'
-        # )
+        evaluate_model(
+            y_test, y_pred_mlp,
+            f'{model_description} (Multi Layer Perceptron)'
+        )
         evaluate_model(
             y_test, y_pred_lin_reg,
             f'{model_description} (Linear Regression)',
@@ -430,10 +430,10 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             rf_lgb_model,
             f'{model_description} (Random Forest, LightGBM)'
         )
-        # save_model_parameters(
-        #     mlp_model,
-        #     f'{model_description} (Multi Layer Perceptron)'
-        # )
+        save_model_parameters(
+            mlp_model,
+            f'{model_description} (Multi Layer Perceptron)'
+        )
         save_model_parameters(
             lin_reg_model,
             f'{model_description} (Linear Regression)'
@@ -469,7 +469,7 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         y_complete[f'{target}_gbt_xgb_squarederror'] = y_pred_gbt_xgb_squarederror
         y_complete[f'{target}_gbt_xgb_absoluteerror'] = y_pred_gbt_xgb_absoluteerror
         y_complete[f'{target}_rf_lgb'] = y_pred_rf_lgb
-        # y_complete[f'{target}_mlp'] = y_pred_mlp
+        y_complete[f'{target}_mlp'] = y_pred_mlp
         y_complete[f'{target}_lin_reg'] = y_pred_lin_reg
 
         # store y values for all the data
@@ -486,9 +486,9 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         y_complete_all[f'{target}_rf_lgb_all'] = rf_lgb_model.predict(
             X.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X
         )
-        # y_complete_all[f'{target}_mlp_all'] = mlp_model.predict(
-        #     impute_scale_standard(X.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X #!!!
-        #                  ))
+        y_complete_all[f'{target}_mlp_all'] = mlp_model.predict(
+            impute_scale_standard(X.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X #!!!
+                         ))
         y_complete_all[f'{target}_lin_reg_all'] = lin_reg_model.predict(
             impute_scale(X.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X
         ))

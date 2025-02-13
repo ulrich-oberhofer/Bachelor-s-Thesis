@@ -18,16 +18,18 @@ def cos_transformer(period: int) -> FunctionTransformer:
 
 def get_feature_data(country: str) -> pd.DataFrame:
     if country == 'AUS':
-        feature_data = pd.read_pickle('../data/[feature_data]/feature_data_AUS.pkl')
+        feature_data = pd.read_pickle('../data/[feature_data]/AUS/feature_data_AUS.pkl')
         feature_data.index = pd.to_datetime(feature_data.index)
+        feature_data = feature_data.resample('5min').mean()
         feature_data.rename(columns={'Hyrdo': 'Hydro'}, inplace=True)
+        feature_data.index = pd.to_datetime(feature_data.index).tz_localize('Australia/Queensland')
 
     elif country == 'CE':
         input_actual = pd.read_hdf('../data/[feature_data]/CE/input_actual.h5')
         input_forecast = pd.read_hdf('../data/[feature_data]/CE/input_forecast.h5')
         feature_data = pd.concat([input_actual, input_forecast], axis=1)
         #feature_data.index = feature_data.index #- pd.Timedelta(hours=2) # !!! - pd.Timedelta(hours=2) is just for testing !!!
-        
+
         # align with frequency data timestamps
         ### feature_data.index = feature_data.index.tz_localize(None) - pd.Timedelta(hours=2) #!!! makes no  sense in my opinion
         #feature_data.index = feature_data.index.tz_localize(None).tz_localize('CET', ambiguous=True)
@@ -68,7 +70,7 @@ def filter_outliers(feature_data: pd.DataFrame, outlier_percent: float) -> pd.Da
     return feature_data
 
 
-for area in ['CE']: #!!! at the moment only for CE !!! ['AUS', 'CE']
+for area in ['AUS']: #['CE']: #!!! at the moment only for CE !!! ['AUS', 'CE']
 
     features = get_feature_data(area)
     features = add_time_features(features)
@@ -84,6 +86,7 @@ for area in ['CE']: #!!! at the moment only for CE !!! ['AUS', 'CE']
         print(features.index)
         print(targets.index)
         combined = features.join(targets, how='inner')
-        combined = filter_outliers(combined, s.settings[area]['outlier percent'])
+        # do not use outlier filtering of the frequency data
+        #combined = filter_outliers(combined, s.settings[area]['outlier percent'])
         combined.to_hdf(f'../results/prepared_features/{area}_{datatype}_ml.h5', key='df', mode='w')
         

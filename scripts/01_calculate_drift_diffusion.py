@@ -44,7 +44,7 @@ def plot_frequency(data: pd.DataFrame, country: str) -> None:
     plt.savefig(f'../results/km/plots/frequency/{country}_frequency.pdf')
 
 
-for area in ['CE']: #['AUS', 'CE'] !!! just for CE at the moment
+for area in ['AUS']: #['CE']: #['AUS', 'CE'] !!! just for CE at the moment
     print(f"Calculating drift and diffusion for {s.settings[area]['name']}")
     freq = get_frequency_data(area)
 
@@ -89,8 +89,9 @@ for area in ['CE']: #['AUS', 'CE'] !!! just for CE at the moment
         '''Alternative calculation of drift and diffusion'''
         df = angular_freq
         frequency = df['frequency'] 
+        print(s.settings[area]['detrend sigma'])
         if datatype == 'detrended':
-            data_filter = gaussian_filter1d(frequency, sigma=s.settings[area]['detrend sigma'])
+            data_filter = gaussian_filter1d(frequency.values.astype(float), sigma=s.settings[area]['detrend sigma'])
             frequency = frequency.values - data_filter
             df['frequency'] = frequency
         # df_grouped = df.groupby('hour')
@@ -101,12 +102,16 @@ for area in ['CE']: #['AUS', 'CE'] !!! just for CE at the moment
         drift_list = []
         diffusion_list = []
         for t,segment in df_resampled:
-            if segment['frequency'].count() == 3600:
+            if segment['frequency'].count() == s.settings[area]['values per hour']:
                 index.append(t)
                 drift_list.append(fun_drift(segment))
                 diffusion_list.append(fun_diffusion(segment))
         drift_diffusion = pd.DataFrame({'drift': drift_list, 'diffusion': diffusion_list}, index=pd.to_datetime(index))
 
+        # drop values that were not calculated correctly
+        drift_diffusion.loc[drift_diffusion['diffusion']==0,:] = np.nan
+        drift_diffusion.loc[drift_diffusion['drift']==0,:] = np.nan
+        # # drift_diffusion.dropna(inplace=True)
 
         # store the results
         # index = angular_freq['hour'].unique()
