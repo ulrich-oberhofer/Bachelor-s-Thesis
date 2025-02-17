@@ -40,15 +40,15 @@ def plot_boxplot(country: str) -> None:
 
     ax[0].yaxis.grid(True)
     ax[1].yaxis.grid(True)
-
+    print(data['drift_true'])
     bplot_drift = ax[0].boxplot(
-        [data['drift_true'],
-         data['drift_gbt_lgb'],
-         data['drift_gbt_xgb_squarederror'],
-         data['drift_gbt_xgb_absoluteerror'],
-         data['drift_rf_lgb'],
-         data['drift_mlp'],
-         data['drift_lin_reg']],
+        [data['drift_true']],#,
+        #  data['drift_gbt_lgb'],
+        #  data['drift_gbt_xgb_squarederror'],
+        #  data['drift_gbt_xgb_absoluteerror'],
+        #  data['drift_rf_lgb'],
+        #  data['drift_mlp'],
+        #  data['drift_lin_reg']],
         vert=True, patch_artist=True, labels=labels, medianprops=dict(color='black')
     )
 

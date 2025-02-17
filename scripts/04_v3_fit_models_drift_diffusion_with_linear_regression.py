@@ -176,18 +176,26 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
     if do_grid_search:
         params = {
             'activation': ['identity', 'relu'],
-            'alpha': [0.0001, 0.0005, 0.01],
-            'learning_rate_init': [0.001, 0.005, 0.01],
+            'alpha': [0.0001, 0.0005, 0.001, 0.005, 0.01],
+            'learning_rate_init': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1],
             'hidden_layer_sizes': [
-                (10, 100,),
+                # (10, 100,),
                 (10, 100, 10,),
-                (10, 50, 10,),
-                (20, 100, 20,),
+                # (10, 50, 10,),
+                # (20, 100, 20,),
                 (50, 50, 50, 50,),
                 (10, 100, 100, 10,),
                 (20, 100, 100, 20,),
                 (10, 50, 50, 10,),
                 (10, 50, 100, 50, 10,),
+                (64, 64, 64),
+                (64, 128, 64),
+                (128,128, 128),
+                (128, 256, 128),
+                (128, 256, 128, 64),
+                (128, 256, 128, 64, 32),
+                (128, 256, 128, 64, 32, 16),
+                (128, 256, 128, 64, 32, 16, 8),
             ],
         }
 
@@ -214,8 +222,8 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
         max_iter=100,
         activation=best_parameters['activation'],
         alpha=best_parameters['alpha'],
-        learning_rate_init=0.00001, #best_parameters['learning_rate_init'],
-        hidden_layer_sizes=(128,264,128,64), #best_parameters['hidden_layer_sizes'],
+        learning_rate_init=0.0005, #best_parameters['learning_rate_init'],
+        hidden_layer_sizes=(128,264,128,64,32), #best_parameters['hidden_layer_sizes'],
         early_stopping=True,
     )
 
@@ -236,7 +244,7 @@ def impute_scale_standard(x: np.array) -> np.array: #!!! newly added
     return x
 
 
-def evaluate_model(y_true: np.array, y_pred: np.array, model_type: str, dict_eval = None) -> None:
+def evaluate_model(y_true: np.array, y_pred: np.array, model_type: str, dict_eval = None, set: str = 'test') -> None:
     mse = mean_squared_error(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
     mape = mean_absolute_percentage_error(y_true, y_pred)
@@ -249,7 +257,7 @@ def evaluate_model(y_true: np.array, y_pred: np.array, model_type: str, dict_eva
             'Mean Absolute Percentage Error': mape,
             'r2-Score': r2
         }
-    with open(f'../results/{files_prefix}model_errors_v3.txt', mode='a') as file:
+    with open(f'../results/{files_prefix}model_errors_{set}_v3.txt', mode='a') as file:
         file.write(f'\n{model_type}\n')
         file.write(f'Mean Squared Error: {mse}\n')
         file.write(f'Mean Absolute Error: {mae}\n')
@@ -276,9 +284,11 @@ elif s.ml['knockout']:
 # clear model parameters and errors files
 open(f'../results/{files_prefix}model_parameters_v3.txt', 'w').close()
 open(f'../results/{files_prefix}model_errors_v3.txt', 'w').close()
+open(f'../results/{files_prefix}model_errors_train_v3.txt', 'w').close()
+open(f'../results/{files_prefix}model_errors_test_v3.txt', 'w').close()
 
 dict_eval = {}
-for area in ['AUS']: #['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
+for area in ['AUS', 'CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
     dict_eval[area] = {}
     y_complete = pd.DataFrame()
     y_complete_all = pd.DataFrame()
@@ -302,19 +312,16 @@ for area in ['AUS']: #['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!
         X, y = X[valid_ind], y[valid_ind]
 
 
-        block_size = '1d'
+        # X_train, X_test, y_train, y_test = train_test_split(
+        #     X, y, test_size=s.ml['test size'], shuffle = True, random_state=200)
+
+        block_size = '4d'
         masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
         train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=200)
         X_train = X.loc[pd.concat(train_mask)]
         y_train = y.loc[pd.concat(train_mask)]
         X_test = X.loc[pd.concat(test_mask)]
         y_test = y.loc[pd.concat(test_mask)]
-
-
-        # X_train, X_test, y_train, y_test = train_test_split(
-        #     X, y, test_size=s.ml['test size'], shuffle = True, random_state=42)
-
-
         
         # fit imputer and scaler
         imp.fit(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train)
@@ -385,33 +392,46 @@ for area in ['AUS']: #['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!
             impute_scale(X_test.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_test
         ))
 
+        # In order to calculate the training errors, we also need to predict on the training data
+        y_pred_gbt_lgb_train = gbt_lgb_model.predict(
+            X_train.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_train
+        )
+        y_pred_gbt_xgb_squarederror_train = gbt_xgb_squarederror_model.predict(
+            impute_scale(X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_train)
+        )
+        y_pred_gbt_xgb_absoluteerror_train = gbt_xgb_absoluteerror_model.predict(
+            X_train.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_train
+        )
+        y_pred_rf_lgb_train = rf_lgb_model.predict(
+            X_train.drop(columns=s.top_features[area][target]['rf_lgb']) if s.ml['knockout'] else X_train
+        )
+        y_pred_mlp_train = mlp_model.predict(impute_scale_standard( #!!!
+            X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train
+        ))
+        y_pred_lin_reg_train = lin_reg_model.predict(
+            impute_scale(X_train.drop(columns=s.top_features[area][target]['lin_reg']) if s.ml['knockout'] else X_train
+        ))
+
+
+
         # evaluate models
         model_description = f'{area}: Detrended {target.capitalize()}'
-        evaluate_model(
-            y_test, y_pred_gbt_lgb,
-            f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)'
-        )
-        evaluate_model(
-            y_test, y_pred_gbt_xgb_squarederror,
-            f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)'
-        )
-        evaluate_model(
-            y_test, y_pred_gbt_xgb_absoluteerror,
-            f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)'
-        )
-        evaluate_model(
-            y_test, y_pred_rf_lgb,
-            f'{model_description} (Random Forest, LightGBM)'
-        )
-        evaluate_model(
-            y_test, y_pred_mlp,
-            f'{model_description} (Multi Layer Perceptron)'
-        )
-        evaluate_model(
-            y_test, y_pred_lin_reg,
-            f'{model_description} (Linear Regression)',
-            dict_eval[area][target]
-        )
+        evaluate_model(y_test, y_pred_gbt_lgb, f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)')
+        evaluate_model(y_test, y_pred_gbt_xgb_squarederror, f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)' )
+        evaluate_model(y_test, y_pred_gbt_xgb_absoluteerror,f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)')
+        evaluate_model(y_test, y_pred_rf_lgb,f'{model_description} (Random Forest, LightGBM)')
+        evaluate_model(y_test, y_pred_mlp, f'{model_description} (Multi Layer Perceptron)' )
+        evaluate_model(y_test, y_pred_lin_reg, f'{model_description} (Linear Regression)', dict_eval[area][target])
+
+        # Evaluate the training errors
+        evaluate_model(y_train, y_pred_gbt_lgb_train, f'{model_description} (Gradient Boosted Tree, Mean Squared Error, LightGMB)', set='train')
+        evaluate_model(y_train, y_pred_gbt_xgb_squarederror_train, f'{model_description} (Gradient Boosted Tree, Squared Error, XGBoost)', set='train')
+        evaluate_model(y_train, y_pred_gbt_xgb_absoluteerror_train, f'{model_description} (Gradient Boosted Tree, Absolute Error, XGBoost)', set='train')
+        evaluate_model(y_train, y_pred_rf_lgb_train, f'{model_description} (Random Forest, LightGBM)', set='train')
+        evaluate_model(y_train, y_pred_mlp_train, f'{model_description} (Multi Layer Perceptron)', set='train')
+        evaluate_model(y_train, y_pred_lin_reg_train, f'{model_description} (Linear Regression)', dict_eval[area][target], set='train')
+
+        # Do the same for the training data
 
         # # model parameters
         save_model_parameters(
