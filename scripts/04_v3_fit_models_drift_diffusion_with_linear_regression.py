@@ -175,36 +175,42 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
 
     if do_grid_search:
         params = {
-            'activation': ['identity', 'relu'],
-            'alpha': [0.0001, 0.0005, 0.001, 0.005, 0.01],
-            'learning_rate_init': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1],
+            'activation': ['relu', 'identity'],
+            'solver': ['adam', 'lbfgs', 'sgd'],
+            'alpha': [0.0001, 0.001, 0.01],
+            'learning_rate_init': [0.0001, 0.001, 0.01, 0.1],
             'hidden_layer_sizes': [
                 # (10, 100,),
-                (10, 100, 10,),
+                # (10, 100, 10,),
                 # (10, 50, 10,),
                 # (20, 100, 20,),
-                (50, 50, 50, 50,),
-                (10, 100, 100, 10,),
-                (20, 100, 100, 20,),
-                (10, 50, 50, 10,),
-                (10, 50, 100, 50, 10,),
-                (64, 64, 64),
+                # (50, 50, 50, 50,),
+                # (10, 100, 100, 10,),
+                # (20, 100, 100, 20,),
+                # (10, 50, 50, 10,),
+                # (10, 50, 100, 50, 10,),
+                # (64, 64, 64),
                 (64, 128, 64),
-                (128,128, 128),
+                # (128,128, 128),
                 (128, 256, 128),
                 (128, 256, 128, 64),
                 (128, 256, 128, 64, 32),
-                (128, 256, 128, 64, 32, 16),
-                (128, 256, 128, 64, 32, 16, 8),
+                # (128, 256, 128, 64, 32, 16),
+                # (128, 256, 128, 64, 32, 8),
+                (16),
+                (16,16),
+                (32,16),
+                (32),
+                (64),
+                (128),
+                (64,32)
             ],
         }
-
         grid_search = GridSearchCV(
             estimator=MLPRegressor(
                 random_state=42,
-                solver='adam',
                 learning_rate='constant',
-                max_iter=100,
+                max_iter=1000,
                 early_stopping=True, # added early stopping to prevent overfitting
             ),
             param_grid=params,
@@ -214,20 +220,22 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
 
         grid_search.fit(X_train, y_train)
         best_parameters = grid_search.best_estimator_.get_params()
-
+        print('Best parameters: ', best_parameters)
     model = MLPRegressor(
         random_state=42,
-        solver='adam',
+        solver=best_parameters['solver'], #'lbfgs',#'sgd',#'adam',
         learning_rate='constant',
-        max_iter=100,
+        max_iter=1000,
         activation=best_parameters['activation'],
         alpha=best_parameters['alpha'],
-        learning_rate_init=0.0005, #best_parameters['learning_rate_init'],
-        hidden_layer_sizes=(128,264,128,64,32), #best_parameters['hidden_layer_sizes'],
+        learning_rate_init = best_parameters['learning_rate_init'],
+        hidden_layer_sizes = best_parameters['hidden_layer_sizes'],
         early_stopping=True,
+        #batch_size=128,
     )
 
     model.fit(X_train, y_train)
+    print(best_parameters['activation'])
     return model
 
 
