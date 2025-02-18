@@ -1,72 +1,12 @@
 
-CE: Detrended Drift (Gradient Boosted Tree, Mean Squared Error, LightGMB)
-Mean Squared Error: 3.0000899490633375e-06
-Mean Absolute Error: 0.0012970369233480735
-Mean Absolute Percentage Error: 0.12872674735460826
-r2-Score: 0.5108457677849965
-
-CE: Detrended Drift (Gradient Boosted Tree, Squared Error, XGBoost)
-Mean Squared Error: 1.302970947034445e-06
-Mean Absolute Error: 0.0008645884423284565
-Mean Absolute Percentage Error: 0.08642882321999461
-r2-Score: 0.787555118674332
-
-CE: Detrended Drift (Gradient Boosted Tree, Absolute Error, XGBoost)
-Mean Squared Error: 1.4851668200043954e-06
-Mean Absolute Error: 0.0006208597216554671
-Mean Absolute Percentage Error: 0.06086774623414792
-r2-Score: 0.7578487152436005
-
-CE: Detrended Drift (Random Forest, LightGBM)
-Mean Squared Error: 3.3995547868657614e-06
-Mean Absolute Error: 0.0013779594542038635
-Mean Absolute Percentage Error: 0.1366748994018034
-r2-Score: 0.4457144152756687
-
 CE: Detrended Drift (Multi Layer Perceptron)
-Mean Squared Error: 3.6685267530789025e-06
-Mean Absolute Error: 0.0014306092762738822
-Mean Absolute Percentage Error: 0.14062504185931063
-r2-Score: 0.4018594716392534
+Mean Squared Error: 1.4231220499128482e-05
+Mean Absolute Error: 0.0029158379446982993
+Mean Absolute Percentage Error: 0.28948956606741105
+r2-Score: -1.264314088742553
 
 CE: Detrended Drift (Linear Regression)
-Mean Squared Error: 3.7860005467629407e-06
-Mean Absolute Error: 0.0014525551103054804
-Mean Absolute Percentage Error: 0.14379196511299241
-r2-Score: 0.3827057781398835
-
-CE: Detrended Diffusion (Gradient Boosted Tree, Mean Squared Error, LightGMB)
-Mean Squared Error: 3.9233051963149865e-12
-Mean Absolute Error: 1.1999365737161786e-06
-Mean Absolute Percentage Error: 0.03797903465102204
-r2-Score: 0.9685600890481949
-
-CE: Detrended Diffusion (Gradient Boosted Tree, Squared Error, XGBoost)
-Mean Squared Error: 1.247874143896009e-10
-Mean Absolute Error: 6.228079336960512e-06
-Mean Absolute Percentage Error: 0.19888688661007706
-r2-Score: -1.554312234475219e-14
-
-CE: Detrended Diffusion (Gradient Boosted Tree, Absolute Error, XGBoost)
-Mean Squared Error: 4.266212661560611e-11
-Mean Absolute Error: 1.1896235680635124e-06
-Mean Absolute Percentage Error: 0.022288615945516774
-r2-Score: 0.6581215595796334
-
-CE: Detrended Diffusion (Random Forest, LightGBM)
-Mean Squared Error: 8.355669903927739e-11
-Mean Absolute Error: 4.15796902265019e-06
-Mean Absolute Percentage Error: 0.12230952272902779
-r2-Score: 0.3304076420847626
-
-CE: Detrended Diffusion (Multi Layer Perceptron)
-Mean Squared Error: 4.816814791564456e-10
-Mean Absolute Error: 1.6696190360857656e-05
-Mean Absolute Percentage Error: 0.5718657294168413
-r2-Score: -2.860016504970503
-
-CE: Detrended Diffusion (Linear Regression)
-Mean Squared Error: 8.27497630222916e-11
-Mean Absolute Error: 4.09182264974797e-06
-Mean Absolute Percentage Error: 0.12017740277864826
-r2-Score: 0.3368741276749396
+Mean Squared Error: 3.959350574286964e-06
+Mean Absolute Error: 0.0014693951299586986
+Mean Absolute Percentage Error: 0.145451464690075
+r2-Score: 0.3700320160046766

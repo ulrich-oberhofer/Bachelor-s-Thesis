@@ -390,6 +390,7 @@ parameters_v3 = {
                 'learning_rate_init': 0.001,
                 'hidden_layer_sizes': (50, 50, 50, 50),
                 'alpha': 0.01,
+                'solver': 'adam'
             }
         },
         'diffusion': {
@@ -433,6 +434,7 @@ parameters_v3 = {
                 'learning_rate_init': 0.01,
                 'hidden_layer_sizes': (10, 50, 50, 10),
                 'alpha': 0.0001,
+                'solver': 'adam'
             }
         }
     },
@@ -478,6 +480,7 @@ parameters_v3 = {
                 'learning_rate_init': 0.005,
                 'hidden_layer_sizes': (20, 100, 100, 20),
                 'alpha': 0.0005,
+                'solver': 'adam'
             }
         },
         'diffusion': {
@@ -521,6 +524,7 @@ parameters_v3 = {
                 'learning_rate_init': 0.005,
                 'hidden_layer_sizes': (10, 100, 10),
                 'alpha': 0.0001,
+                'solver': 'adam'
             }
         }
     }
