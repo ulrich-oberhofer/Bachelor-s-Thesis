@@ -1,0 +1,24 @@
+
+AUS: Detrended Drift (Multi Layer Perceptron)
+Mean Squared Error: 0.00033928030556054775
+Mean Absolute Error: 0.014664093800581365
+Mean Absolute Percentage Error: 1.146866048424979
+r2-Score: 0.18091265739862128
+
+AUS: Detrended Drift (Linear Regression)
+Mean Squared Error: 0.000396208570093927
+Mean Absolute Error: 0.015879454604571536
+Mean Absolute Percentage Error: 1.256628504477398
+r2-Score: 0.043476973242080885
+
+AUS: Detrended Diffusion (Multi Layer Perceptron)
+Mean Squared Error: 1.3503328336220221e-08
+Mean Absolute Error: 9.007540209633509e-05
+Mean Absolute Percentage Error: 21.38514031809414
+r2-Score: 0.3057271274919192
+
+AUS: Detrended Diffusion (Linear Regression)
+Mean Squared Error: 1.4248136425278623e-08
+Mean Absolute Error: 9.233609198236844e-05
+Mean Absolute Percentage Error: 20.42389826305557
+r2-Score: 0.2674328611760508
