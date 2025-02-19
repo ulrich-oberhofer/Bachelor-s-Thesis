@@ -296,7 +296,7 @@ open(f'../results/{files_prefix}model_errors_train_v3.txt', 'w').close()
 open(f'../results/{files_prefix}model_errors_test_v3.txt', 'w').close()
 
 dict_eval = {}
-for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
+for area in ['AUS']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
     dict_eval[area] = {}
     y_complete = pd.DataFrame()
     y_complete_all = pd.DataFrame()
@@ -311,7 +311,7 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         X['random_noise'] = np.random.rand(X.shape[0])
 
     print('Share of nans: ', X.isna().any(axis=1).sum()/len(X))
-    for target in ['diffusion']: # ['drift', 'diffusion']
+    for target in ['drift', 'diffusion']:
         dict_eval[area][target] = {}
         y = data[target]
 
@@ -321,11 +321,11 @@ for area in ['CE']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
 
 
         # X_train, X_test, y_train, y_test = train_test_split(
-        #     X, y, test_size=s.ml['test size'], shuffle = True, random_state=200)
+        #     X, y, test_size=s.ml['test size'], shuffle = True, random_state=2)
 
         block_size = '4d'
         masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
-        train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=200)
+        train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=2)
         X_train = X.loc[pd.concat(train_mask)]
         y_train = y.loc[pd.concat(train_mask)]
         X_test = X.loc[pd.concat(test_mask)]
