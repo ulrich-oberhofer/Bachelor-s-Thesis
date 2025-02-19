@@ -19,10 +19,10 @@ def cos_transformer(period: int) -> FunctionTransformer:
 def get_feature_data(country: str) -> pd.DataFrame:
     if country == 'AUS':
         feature_data = pd.read_pickle('../data/[feature_data]/AUS/feature_data_AUS.pkl')
-        feature_data.index = pd.to_datetime(feature_data.index)
+        #feature_data.index = pd.to_datetime(feature_data.index)
         feature_data = feature_data.resample('5min').mean()
-        feature_data.rename(columns={'Hyrdo': 'Hydro'}, inplace=True)
-        feature_data.index = pd.to_datetime(feature_data.index).tz_localize('Australia/Queensland')
+        #feature_data.rename(columns={'Hyrdo': 'Hydro'}, inplace=True)
+        #feature_data.index = pd.to_datetime(feature_data.index).tz_localize('Australia/Queensland')
 
     elif country == 'CE':
         input_actual = pd.read_hdf('../data/[feature_data]/CE/input_actual.h5')
