@@ -388,8 +388,8 @@ parameters_v3 = {
             'mlp': {
                 'activation': 'relu',
                 'learning_rate_init': 0.001,
-                'hidden_layer_sizes': (50, 50, 50, 50),
-                'alpha': 0.01,
+                'hidden_layer_sizes': (128, 256, 128, 64, 32),
+                'alpha': 0.001,
                 'solver': 'adam'
             }
         },
@@ -430,11 +430,11 @@ parameters_v3 = {
                 'bagging_fraction': 0.3
             },
             'mlp': {
-                'activation': 'identity',
-                'learning_rate_init': 0.01,
-                'hidden_layer_sizes': (10, 50, 50, 10),
-                'alpha': 0.0001,
-                'solver': 'adam'
+                'activation': 'relu',
+                'learning_rate_init': 0.1,
+                'hidden_layer_sizes': (128),
+                'alpha': 0.01,
+                'solver': 'sgd'
             }
         }
     },
@@ -477,9 +477,9 @@ parameters_v3 = {
             },
             'mlp': {
                 'activation': 'relu',
-                'learning_rate_init': 0.005,
-                'hidden_layer_sizes': (20, 100, 100, 20),
-                'alpha': 0.0005,
+                'learning_rate_init': 0.0001,
+                'hidden_layer_sizes': (64),
+                'alpha': 0.01,
                 'solver': 'adam'
             }
         },
@@ -520,10 +520,10 @@ parameters_v3 = {
                 'bagging_fraction': 0.3
             },
             'mlp': {
-                'activation': 'identity',
-                'learning_rate_init': 0.005,
-                'hidden_layer_sizes': (10, 100, 10),
-                'alpha': 0.0001,
+                'activation': 'relu',
+                'learning_rate_init': 0.01,
+                'hidden_layer_sizes': (128),
+                'alpha': 0.01,
                 'solver': 'adam'
             }
         }

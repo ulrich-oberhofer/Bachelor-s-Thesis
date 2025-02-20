@@ -4,7 +4,7 @@
 import lightgbm as lgb
 import numpy as np
 import xgboost as xgb
-#import shap
+import shap
 import joblib as jbl
 import pandas as pd
 
@@ -242,8 +242,8 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
 def impute_scale(x: np.array) -> np.array:
     #x = imp.transform(x) # !!! left that out -> we don't want to impute the test data -> actually need to rename the funnction
     
-    x = min_max_scaler.transform(x)
-    #x = standard_scaler.transform(x)
+    #x = min_max_scaler.transform(x)
+    x = standard_scaler.transform(x)
     return x
 
 def impute_scale_standard(x: np.array) -> np.array: #!!! newly added
@@ -296,7 +296,7 @@ open(f'../results/{files_prefix}model_errors_train_v3.txt', 'w').close()
 open(f'../results/{files_prefix}model_errors_test_v3.txt', 'w').close()
 
 dict_eval = {}
-for area in ['AUS']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
+for area in ['AUS', 'CE']: # !!! just for CE at the moment !!!
     dict_eval[area] = {}
     y_complete = pd.DataFrame()
     y_complete_all = pd.DataFrame()
@@ -320,16 +320,16 @@ for area in ['AUS']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         X, y = X[valid_ind], y[valid_ind]
 
 
-        # X_train, X_test, y_train, y_test = train_test_split(
-        #     X, y, test_size=s.ml['test size'], shuffle = True, random_state=2)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=s.ml['test size'], shuffle = True, random_state=2)
 
-        block_size = '4d'
-        masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
-        train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=2)
-        X_train = X.loc[pd.concat(train_mask)]
-        y_train = y.loc[pd.concat(train_mask)]
-        X_test = X.loc[pd.concat(test_mask)]
-        y_test = y.loc[pd.concat(test_mask)]
+        # block_size = '4d'
+        # masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
+        # train_mask, test_mask = train_test_split(masker, test_size = 0.2, random_state=2)
+        # X_train = X.loc[pd.concat(train_mask)]
+        # y_train = y.loc[pd.concat(train_mask)]
+        # X_test = X.loc[pd.concat(test_mask)]
+        # y_test = y.loc[pd.concat(test_mask)]
         
         # fit imputer and scaler
         imp.fit(X_train.drop(columns=s.top_features[area][target]['mlp']) if s.ml['knockout'] else X_train)
@@ -347,7 +347,7 @@ for area in ['AUS']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             s.ml['random search gbt_lgb']
         )
         gbt_xgb_squarederror_model = fit_xgb(
-            impute_scale(X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
+            (X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml[
                 'knockout'] else X_train),
             y_train,
             ml_parameters.parameters_v3[area][target]['gbt_xgb_squarederror'],
@@ -385,7 +385,7 @@ for area in ['AUS']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             X_test.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_test
         )
         y_pred_gbt_xgb_squarederror = gbt_xgb_squarederror_model.predict(
-            impute_scale(X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test)
+            (X_test.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_test)
         )
         y_pred_gbt_xgb_absoluteerror = gbt_xgb_absoluteerror_model.predict(
             X_test.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_test
@@ -405,7 +405,7 @@ for area in ['AUS']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
             X_train.drop(columns=s.top_features[area][target]['gbt_lgb']) if s.ml['knockout'] else X_train
         )
         y_pred_gbt_xgb_squarederror_train = gbt_xgb_squarederror_model.predict(
-            impute_scale(X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_train)
+            (X_train.drop(columns=s.top_features[area][target]['gbt_xgb_squarederror']) if s.ml['knockout'] else X_train)
         )
         y_pred_gbt_xgb_absoluteerror_train = gbt_xgb_absoluteerror_model.predict(
             X_train.drop(columns=s.top_features[area][target]['gbt_xgb_absoluteerror']) if s.ml['knockout'] else X_train
@@ -468,27 +468,27 @@ for area in ['AUS']: # ['AUS', 'CE'] # !!! just for CE at the moment !!!
         )
 
         '''Don't calculate SHAP values for now'''
-        # # shap feature importance
-        # gbt_lgb_explainer = shap.Explainer(gbt_lgb_model)
-        # gbt_xgb_squarederror_explainer = shap.Explainer(gbt_xgb_squarederror_model)
-        # gbt_xgb_absoluteerror_explainer = shap.Explainer(gbt_xgb_absoluteerror_model)
-        # rf_lgb_explainer = shap.Explainer(rf_lgb_model)
-        # # The MLP explainer is currently not implemented due to a large computing time
-        # # mlp_explainer = shap.KernelExplainer(mlp_model.predict, impute_scale(X_train))
+        # shap feature importance
+        gbt_lgb_explainer = shap.Explainer(gbt_lgb_model)
+        gbt_xgb_squarederror_explainer = shap.Explainer(gbt_xgb_squarederror_model)
+        gbt_xgb_absoluteerror_explainer = shap.Explainer(gbt_xgb_absoluteerror_model)
+        rf_lgb_explainer = shap.Explainer(rf_lgb_model)
+        # The MLP explainer is currently not implemented due to a large computing time
+        # mlp_explainer = shap.KernelExplainer(mlp_model.predict, impute_scale(X_train))
 
-        # # save shap explainers
-        # path_prefix = f'../results/{files_prefix}explainers/{area}_detrended_{target}'
-        # with open(f'{path_prefix}_gbt_lgb_shap_values', 'wb') as file:
-        #     jbl.dump(gbt_lgb_explainer, file)
-        # with open(f'{path_prefix}_gbt_xgb_squarederror_shap_values', 'wb') as file:
-        #     jbl.dump(gbt_xgb_squarederror_explainer, file)
-        # with open(f'{path_prefix}_gbt_xgb_absoluteerror_shap_values', 'wb') as file:
-        #     jbl.dump(gbt_xgb_absoluteerror_explainer, file)
-        # with open(f'{path_prefix}_rf_lgb_shap_values', 'wb') as file:
-        #     jbl.dump(rf_lgb_explainer, file)
-        # # The MLP explainer is currently not implemented due to a large computing time
-        # # with open(f'{path_prefix}_mlp_shap_values', 'wb') as file:
-        # # jbl.dump(mlp_explainer, file)
+        # save shap explainers
+        path_prefix = f'../results/{files_prefix}explainers/{area}_detrended_{target}'
+        with open(f'{path_prefix}_gbt_lgb_shap_values', 'wb') as file:
+            jbl.dump(gbt_lgb_explainer, file)
+        with open(f'{path_prefix}_gbt_xgb_squarederror_shap_values', 'wb') as file:
+            jbl.dump(gbt_xgb_squarederror_explainer, file)
+        with open(f'{path_prefix}_gbt_xgb_absoluteerror_shap_values', 'wb') as file:
+            jbl.dump(gbt_xgb_absoluteerror_explainer, file)
+        with open(f'{path_prefix}_rf_lgb_shap_values', 'wb') as file:
+            jbl.dump(rf_lgb_explainer, file)
+        # The MLP explainer is currently not implemented due to a large computing time
+        # with open(f'{path_prefix}_mlp_shap_values', 'wb') as file:
+        # jbl.dump(mlp_explainer, file)
         ''' End of SHAP calue calculation'''
 
         # store y values for box plot
