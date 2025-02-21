@@ -321,7 +321,7 @@ for area in ['AUS', 'CE']: # !!! just for CE at the moment !!!
 
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=s.ml['test size'], shuffle = True, random_state=42)
+            X, y, test_size=s.ml['test size'], shuffle = True, random_state=2)
 
         # block_size = '4d'
         # masker = [pd.Series(g.index) for n, g in X.groupby(pd.Grouper(freq=block_size))]
