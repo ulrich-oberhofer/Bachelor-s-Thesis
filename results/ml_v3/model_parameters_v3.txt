@@ -1,0 +1,368 @@
+
+AUS: Detrended Drift (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+boosting_type: gbdt
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.17685430556951093
+max_depth: 10
+min_child_samples: 43
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 230
+num_leaves: 31
+random_state: 42
+reg_alpha: 0.056411579027100256
+reg_lambda: 0.7219987722668247
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+
+AUS: Detrended Drift (Gradient Boosted Tree, Squared Error, XGBoost)
+objective: reg:squarederror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 21
+missing: nan
+n_estimators: 199
+random_state: 42
+reg_alpha: 0.14286681792194078
+reg_lambda: 0.6508884729488529
+eta: 0.03904180608409973
+
+AUS: Detrended Drift (Gradient Boosted Tree, Absolute Error, XGBoost)
+objective: reg:absoluteerror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 21
+missing: nan
+n_estimators: 199
+random_state: 42
+reg_alpha: 0.14286681792194078
+reg_lambda: 0.6508884729488529
+eta: 0.03904180608409973
+
+AUS: Detrended Drift (Random Forest, LightGBM)
+boosting_type: rf
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.1
+max_depth: 7
+min_child_samples: 58
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 221
+num_leaves: 92
+random_state: 42
+reg_alpha: 0.09997491581800289
+reg_lambda: 0.45924889196586716
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+bagging_freq: 7
+bagging_fraction: 0.3745401188473625
+
+AUS: Detrended Drift (Multi Layer Perceptron)
+activation: relu
+alpha: 0.001
+batch_size: auto
+beta_1: 0.9
+beta_2: 0.999
+early_stopping: True
+epsilon: 1e-08
+hidden_layer_sizes: (128, 256, 128, 64, 32)
+learning_rate: constant
+learning_rate_init: 0.001
+max_fun: 15000
+max_iter: 1000
+momentum: 0.9
+n_iter_no_change: 10
+nesterovs_momentum: True
+power_t: 0.5
+random_state: 42
+shuffle: True
+solver: adam
+tol: 0.0001
+validation_fraction: 0.1
+verbose: False
+warm_start: False
+
+AUS: Detrended Drift (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False
+
+AUS: Detrended Diffusion (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+boosting_type: gbdt
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.17685430556951093
+max_depth: 10
+min_child_samples: 43
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 230
+num_leaves: 31
+random_state: 42
+reg_alpha: 0.056411579027100256
+reg_lambda: 0.7219987722668247
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+
+AUS: Detrended Diffusion (Gradient Boosted Tree, Squared Error, XGBoost)
+objective: reg:squarederror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 21
+missing: nan
+n_estimators: 199
+random_state: 42
+reg_alpha: 0.14286681792194078
+reg_lambda: 0.6508884729488529
+eta: 0.03904180608409973
+
+AUS: Detrended Diffusion (Gradient Boosted Tree, Absolute Error, XGBoost)
+objective: reg:absoluteerror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 21
+missing: nan
+n_estimators: 199
+random_state: 42
+reg_alpha: 0.14286681792194078
+reg_lambda: 0.6508884729488529
+eta: 0.03904180608409973
+
+AUS: Detrended Diffusion (Random Forest, LightGBM)
+boosting_type: rf
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.1
+max_depth: 7
+min_child_samples: 58
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 221
+num_leaves: 92
+random_state: 42
+reg_alpha: 0.09997491581800289
+reg_lambda: 0.45924889196586716
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+bagging_freq: 7
+bagging_fraction: 0.3745401188473625
+
+AUS: Detrended Diffusion (Multi Layer Perceptron)
+activation: relu
+alpha: 0.01
+batch_size: auto
+beta_1: 0.9
+beta_2: 0.999
+early_stopping: True
+epsilon: 1e-08
+hidden_layer_sizes: 128
+learning_rate: constant
+learning_rate_init: 0.1
+max_fun: 15000
+max_iter: 1000
+momentum: 0.9
+n_iter_no_change: 10
+nesterovs_momentum: True
+power_t: 0.5
+random_state: 42
+shuffle: True
+solver: sgd
+tol: 0.0001
+validation_fraction: 0.1
+verbose: False
+warm_start: False
+
+AUS: Detrended Diffusion (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False
+
+CE: Detrended Drift (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+boosting_type: gbdt
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.19727005942368125
+max_depth: 10
+min_child_samples: 40
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 714
+num_leaves: 92
+random_state: 42
+reg_alpha: 0.09997491581800289
+reg_lambda: 0.45924889196586716
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+
+CE: Detrended Drift (Gradient Boosted Tree, Squared Error, XGBoost)
+objective: reg:squarederror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 21
+missing: nan
+n_estimators: 199
+random_state: 42
+reg_alpha: 0.14286681792194078
+reg_lambda: 0.6508884729488529
+eta: 0.03904180608409973
+
+CE: Detrended Drift (Gradient Boosted Tree, Absolute Error, XGBoost)
+objective: reg:absoluteerror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 21
+missing: nan
+n_estimators: 199
+random_state: 42
+reg_alpha: 0.14286681792194078
+reg_lambda: 0.6508884729488529
+eta: 0.03904180608409973
+
+CE: Detrended Drift (Random Forest, LightGBM)
+boosting_type: rf
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.1
+max_depth: 7
+min_child_samples: 58
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 221
+num_leaves: 92
+random_state: 42
+reg_alpha: 0.09997491581800289
+reg_lambda: 0.45924889196586716
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+bagging_freq: 7
+bagging_fraction: 0.3745401188473625
+
+CE: Detrended Drift (Multi Layer Perceptron)
+activation: relu
+alpha: 0.01
+batch_size: auto
+beta_1: 0.9
+beta_2: 0.999
+early_stopping: True
+epsilon: 1e-08
+hidden_layer_sizes: 64
+learning_rate: constant
+learning_rate_init: 0.0001
+max_fun: 15000
+max_iter: 1000
+momentum: 0.9
+n_iter_no_change: 10
+nesterovs_momentum: True
+power_t: 0.5
+random_state: 42
+shuffle: True
+solver: adam
+tol: 0.0001
+validation_fraction: 0.1
+verbose: False
+warm_start: False
+
+CE: Detrended Drift (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False
+
+CE: Detrended Diffusion (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+boosting_type: gbdt
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.19727005942368125
+max_depth: 10
+min_child_samples: 40
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 714
+num_leaves: 92
+random_state: 42
+reg_alpha: 0.09997491581800289
+reg_lambda: 0.45924889196586716
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+
+CE: Detrended Diffusion (Gradient Boosted Tree, Squared Error, XGBoost)
+objective: reg:squarederror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 29
+missing: nan
+n_estimators: 120
+random_state: 42
+reg_alpha: 0.15601864044243652
+reg_lambda: 0.15599452033620265
+eta: 0.19727005942368125
+
+CE: Detrended Diffusion (Gradient Boosted Tree, Absolute Error, XGBoost)
+objective: reg:absoluteerror
+enable_categorical: False
+max_depth: 10
+min_child_weight: 29
+missing: nan
+n_estimators: 120
+random_state: 42
+reg_alpha: 0.15601864044243652
+reg_lambda: 0.15599452033620265
+eta: 0.19727005942368125
+
+CE: Detrended Diffusion (Random Forest, LightGBM)
+boosting_type: rf
+colsample_bytree: 1.0
+importance_type: split
+learning_rate: 0.1
+max_depth: 7
+min_child_samples: 58
+min_child_weight: 0.001
+min_split_gain: 0.0
+n_estimators: 221
+num_leaves: 92
+random_state: 42
+reg_alpha: 0.09997491581800289
+reg_lambda: 0.45924889196586716
+subsample: 1.0
+subsample_for_bin: 200000
+subsample_freq: 0
+bagging_freq: 7
+bagging_fraction: 0.3745401188473625
+
+CE: Detrended Diffusion (Multi Layer Perceptron)
+activation: relu
+alpha: 0.01
+batch_size: auto
+beta_1: 0.9
+beta_2: 0.999
+early_stopping: True
+epsilon: 1e-08
+hidden_layer_sizes: 128
+learning_rate: constant
+learning_rate_init: 0.01
+max_fun: 15000
+max_iter: 1000
+momentum: 0.9
+n_iter_no_change: 10
+nesterovs_momentum: True
+power_t: 0.5
+random_state: 42
+shuffle: True
+solver: adam
+tol: 0.0001
+validation_fraction: 0.1
+verbose: False
+warm_start: False
+
+CE: Detrended Diffusion (Linear Regression)
+copy_X: True
+fit_intercept: True
+positive: False
