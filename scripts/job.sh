@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=480
+#SBATCH --time=120
 #SBATCH --ntasks-per-node=40
 
 source ../../drift/bin/activate
