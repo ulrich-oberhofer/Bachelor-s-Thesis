@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/pfs/data5/home/kit/iai/bt8891/ML_for_drift_and_diffusion/scripts/04_v3_fit_models_drift_diffusion_with_linear_regression.py", line 7, in <module>
+    import shap
+ModuleNotFoundError: No module named 'shap'
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n429
+Job ID: 25313249
+Cluster: uc2
+User/Group: bt8891/iai
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 80
+CPU Utilized: 00:00:03
+CPU Efficiency: 0.04% of 01:56:00 core-walltime
+Job Wall-clock time: 00:01:27
+Memory Utilized: 118.93 MB
+Memory Efficiency: 0.13% of 87.89 GB

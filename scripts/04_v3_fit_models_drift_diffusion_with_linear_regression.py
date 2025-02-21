@@ -57,7 +57,7 @@ def fit_gbdt_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_se
             n_iter=s.ml['random search iterations'],
             cv=5,
             n_jobs=-1,
-            random_state=42
+            # random_state=42
         )
 
         random_search.fit(X_train, y_train)
@@ -106,7 +106,7 @@ def fit_rf_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_sear
             n_iter=s.ml['random search iterations'],
             cv=5,
             n_jobs=-1,
-            random_state=42
+            # random_state=42
         )
 
         random_search.fit(X_train, y_train)
@@ -150,7 +150,7 @@ def fit_xgb(
             n_iter=s.ml['random search iterations'],
             cv=5,
             n_jobs=-1,
-            random_state=42
+            # random_state=42
         )
 
         random_search.fit(X_train, y_train)
@@ -208,7 +208,7 @@ def fit_mlp(X_train: np.array, y_train: np.array, parameters: dict, do_grid_sear
         }
         grid_search = GridSearchCV(
             estimator=MLPRegressor(
-                random_state=42,
+                # random_state=42,
                 learning_rate='constant',
                 max_iter=1000,
                 early_stopping=True, # added early stopping to prevent overfitting
