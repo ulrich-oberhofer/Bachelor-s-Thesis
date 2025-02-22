@@ -52,7 +52,9 @@ def fit_gbdt_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_se
         }
 
         random_search = RandomizedSearchCV(
-            estimator=lgb.LGBMRegressor(random_state=42, boosting_type='gbdt', n_jobs=1),
+            estimator=lgb.LGBMRegressor(
+                #random_state=42, 
+                boosting_type='gbdt', n_jobs=1),
             param_distributions=param_distributions,
             n_iter=s.ml['random search iterations'],
             cv=5,
@@ -101,7 +103,9 @@ def fit_rf_lgb(X_train: np.array, y_train: np.array, parameters: dict, rand_sear
         }
 
         random_search = RandomizedSearchCV(
-            estimator=lgb.LGBMRegressor(random_state=42, boosting_type='rf', n_jobs=1),
+            estimator=lgb.LGBMRegressor(
+                #random_state=42, 
+                boosting_type='rf', n_jobs=1),
             param_distributions=param_distributions,
             n_iter=s.ml['random search iterations'],
             cv=5,
@@ -145,7 +149,9 @@ def fit_xgb(
         }
 
         random_search = RandomizedSearchCV(
-            estimator=xgb.XGBRegressor(random_state=42, objective=objective, n_jobs=1),
+            estimator=xgb.XGBRegressor(
+                #random_state=42, 
+                objective=objective, n_jobs=1),
             param_distributions=param_distributions,
             n_iter=s.ml['random search iterations'],
             cv=5,
@@ -296,7 +302,7 @@ open(f'../results/{files_prefix}model_errors_train_v3.txt', 'w').close()
 open(f'../results/{files_prefix}model_errors_test_v3.txt', 'w').close()
 
 dict_eval = {}
-for area in ['AUS', 'CE']: # !!! just for CE at the moment !!!
+for area in ['CE']: #['AUS', 'CE']: # !!! just for CE at the moment !!!
     dict_eval[area] = {}
     y_complete = pd.DataFrame()
     y_complete_all = pd.DataFrame()
@@ -311,7 +317,7 @@ for area in ['AUS', 'CE']: # !!! just for CE at the moment !!!
         X['random_noise'] = np.random.rand(X.shape[0])
 
     print('Share of nans: ', X.isna().any(axis=1).sum()/len(X))
-    for target in ['drift', 'diffusion']:
+    for target in ['diffusion']: #['drift', 'diffusion']:
         dict_eval[area][target] = {}
         y = data[target]
 

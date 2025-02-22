@@ -61,7 +61,7 @@ ml = {
     'random search gbt_xgb_absoluteerror': True,  # Perform random search: Gradient Boosted Trees, XGBoost, Absolute Error
     'random search rf_lgb': True,                 # Perform random search: Random Forest, LightGBM
     'grid search mlp': False,                      # Perform grid search: Multi Layer Perceptron
-    'random search iterations': 1000 # !!! 1000              # number of iterations for the random search
+    'random search iterations': 2000 # !!! 1000              # number of iterations for the random search
 }
 
 top_features = {
