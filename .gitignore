@@ -32,3 +32,4 @@ debu*
 *.yaml
 config-*
 scripts/wandb/*/files/requirements.txt
+slurm-*.out
