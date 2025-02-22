@@ -1,0 +1,108 @@
+
+AUS: Detrended Drift (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+Mean Squared Error: 0.0003844049966748922
+Mean Absolute Error: 0.015505286510162362
+Mean Absolute Percentage Error: 0.21674933658301127
+r2-Score: 0.1534747107280725
+
+AUS: Detrended Drift (Gradient Boosted Tree, Squared Error, XGBoost)
+Mean Squared Error: 0.0003836221113044545
+Mean Absolute Error: 0.015467203223825898
+Mean Absolute Percentage Error: 0.21683792637058535
+r2-Score: 0.15519875768482183
+
+AUS: Detrended Drift (Gradient Boosted Tree, Absolute Error, XGBoost)
+Mean Squared Error: 0.0003901332551454065
+Mean Absolute Error: 0.015601370454697325
+Mean Absolute Percentage Error: 0.22164139435575833
+r2-Score: 0.1408601097194453
+
+AUS: Detrended Drift (Random Forest, LightGBM)
+Mean Squared Error: 0.00040455137509939123
+Mean Absolute Error: 0.015898094449630515
+Mean Absolute Percentage Error: 0.2334993865447649
+r2-Score: 0.10910895333391368
+
+AUS: Detrended Drift (Multi Layer Perceptron)
+Mean Squared Error: 0.0004152033429781761
+Mean Absolute Error: 0.0161061685418721
+Mean Absolute Percentage Error: 0.24298996886052804
+r2-Score: 0.08565150541335542
+
+AUS: Detrended Drift (Linear Regression)
+Mean Squared Error: 0.00044154716503179496
+Mean Absolute Error: 0.016408887474660638
+Mean Absolute Percentage Error: 0.2704131330605564
+r2-Score: 0.027637921361718942
+
+AUS: Detrended Diffusion (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+Mean Squared Error: 1.1469942558516912e-08
+Mean Absolute Error: 8.407093393166787e-05
+Mean Absolute Percentage Error: 0.14643186333141897
+r2-Score: 0.4027564568280828
+
+AUS: Detrended Diffusion (Gradient Boosted Tree, Squared Error, XGBoost)
+Mean Squared Error: 1.50895765301178e-08
+Mean Absolute Error: 9.579456144914648e-05
+Mean Absolute Percentage Error: 0.1710094075396366
+r2-Score: 0.21428096907778682
+
+AUS: Detrended Diffusion (Gradient Boosted Tree, Absolute Error, XGBoost)
+Mean Squared Error: 1.1762025212222144e-08
+Mean Absolute Error: 8.422773764948562e-05
+Mean Absolute Percentage Error: 0.14590926170136675
+r2-Score: 0.3875476205058437
+
+AUS: Detrended Diffusion (Random Forest, LightGBM)
+Mean Squared Error: 1.4989790908284252e-08
+Mean Absolute Error: 9.548350915714773e-05
+Mean Absolute Percentage Error: 0.1703738449510314
+r2-Score: 0.21947683802285212
+
+AUS: Detrended Diffusion (Multi Layer Perceptron)
+Mean Squared Error: 1.4838970723292374e-08
+Mean Absolute Error: 9.472918879427415e-05
+Mean Absolute Percentage Error: 0.16806549465759377
+r2-Score: 0.22733009284142203
+
+AUS: Detrended Diffusion (Linear Regression)
+Mean Squared Error: 1.5647907021740496e-08
+Mean Absolute Error: 9.748095604409663e-05
+Mean Absolute Percentage Error: 0.17447672906916875
+r2-Score: 0.18520852347691064
+
+CE: Detrended Drift (Gradient Boosted Tree, Mean Squared Error, LightGMB)
+Mean Squared Error: 3.294249063775343e-06
+Mean Absolute Error: 0.0013731090990215696
+Mean Absolute Percentage Error: 0.13618653211446707
+r2-Score: 0.44329186391848774
+
+CE: Detrended Drift (Gradient Boosted Tree, Squared Error, XGBoost)
+Mean Squared Error: 3.2475566807001337e-06
+Mean Absolute Error: 0.0013588222772846215
+Mean Absolute Percentage Error: 0.1347313415002272
+r2-Score: 0.4511825938079921
+
+CE: Detrended Drift (Gradient Boosted Tree, Absolute Error, XGBoost)
+Mean Squared Error: 3.2562051077244133e-06
+Mean Absolute Error: 0.0013535968712218445
+Mean Absolute Percentage Error: 0.13360580559483182
+r2-Score: 0.44972106203079065
+
+CE: Detrended Drift (Random Forest, LightGBM)
+Mean Squared Error: 3.3499701769879504e-06
+Mean Absolute Error: 0.0013823996908707943
+Mean Absolute Percentage Error: 0.13738300539787426
+r2-Score: 0.4338753333294414
+
+CE: Detrended Drift (Multi Layer Perceptron)
+Mean Squared Error: 3.3919483729333793e-06
+Mean Absolute Error: 0.0013875452307202853
+Mean Absolute Percentage Error: 0.1377988165375539
+r2-Score: 0.42678127250756126
+
+CE: Detrended Drift (Linear Regression)
+Mean Squared Error: 3.570416581626413e-06
+Mean Absolute Error: 0.001425238579394295
+Mean Absolute Percentage Error: 0.14137281451978548
+r2-Score: 0.39662122635202224

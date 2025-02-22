@@ -1,0 +1,12 @@
+
+CE: Detrended Diffusion (Multi Layer Perceptron)
+Mean Squared Error: 8.822762150244163e-11
+Mean Absolute Error: 4.463882477290718e-06
+Mean Absolute Percentage Error: 0.13270848740767685
+r2-Score: 0.32803498123756014
+
+CE: Detrended Diffusion (Linear Regression)
+Mean Squared Error: 8.83884200497088e-11
+Mean Absolute Error: 4.20492508390541e-06
+Mean Absolute Percentage Error: 0.12248568603726055
+r2-Score: 0.32681029675676687
